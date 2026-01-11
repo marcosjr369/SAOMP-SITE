@@ -33,6 +33,12 @@ const documents = [
     pdf: "/documentos/Regulamento do SAOMP - Revistos 2020.pdf",
     logoText: "Regulamento",
   },
+  {
+    title: "Conhecendo as OMP",
+    description: "Todas as informações sobre as OMP e sua estrutura.",
+    pdf: "/documentos/Conhecendo as OMP Manual.pdf",
+    logoText: "Conhecendo as OMP",
+  },
 ];
 
 export default function DocumentsPage() {

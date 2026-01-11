@@ -5,38 +5,45 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-const activities = [
-  {
-    title: "Evangelização",
-    description:
-      "Anúncio da Palavra de Deus através de missões, encontros e ações pastorais.",
-    image: "/movimento13.jpeg",
-  },
-  {
-    title: "Ação Social",
-    description:
-      "Apoio às comunidades mais vulneráveis com alimentos, saúde e solidariedade.",
-    image: "/movimento12.jpeg",
-  },
-  {
-    title: "Formação Missionária",
-    description:
-      "Capacitação espiritual e pastoral para leigos e missionários.",
-    image: "/movimento15.jpeg",
-  },
-  {
-    title: "Apoio às Igrejas",
-    description:
-      "Ajuda espiritual e material às igrejas em regiões mais necessitadas.",
-    image: "/movimento14.jpeg",
-  },
-  {
-    title: "Juventude Missionária",
-    description:
-      "Envolvimento dos jovens na vivência da fé e no serviço ao próximo.",
-    image: "/movimento10.jpeg",
-  },
-];
+const activities = Array.from({ length: 20 }, (_, i) => {
+  const index = i + 1;
+
+  const types = [
+    {
+      title: "Evangelização",
+      description:
+        "Anúncio da Palavra de Deus através de missões, encontros e ações pastorais.",
+    },
+    {
+      title: "Ação Social",
+      description:
+        "Apoio às comunidades mais vulneráveis com alimentos, saúde e solidariedade.",
+    },
+    {
+      title: "Formação Missionária",
+      description:
+        "Capacitação espiritual e pastoral para leigos e missionários.",
+    },
+    {
+      title: "Apoio às Igrejas",
+      description:
+        "Ajuda espiritual e material às igrejas em regiões mais necessitadas.",
+    },
+    {
+      title: "Juventude Missionária",
+      description:
+        "Envolvimento dos jovens na vivência da fé e no serviço ao próximo.",
+    },
+  ];
+
+  const activity = types[i % types.length];
+
+  return {
+    title: `${activity.title}`,
+    description: activity.description,
+    image: `/movimento${index === 1 ? "" : index}.jpeg`,
+  };
+});
 
 export default function ActivitiesSection() {
   return (
@@ -81,15 +88,17 @@ export default function ActivitiesSection() {
             {activities.map((activity, index) => (
               <motion.div
                 key={index}
-                className="min-w-70 md:min-w-[320px] lg:min-w-85 h-100 relative rounded-2xl overflow-hidden snap-start group cursor-pointer flex-shrink-0"
-                whileHover={{ scale: 1.03, y: -5 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="min-w-[280px] md:min-w-[320px] lg:min-w-[340px] h-[420px] relative rounded-2xl overflow-hidden snap-start group cursor-pointer flex-shrink-0"
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
+                whileHover={{ scale: 1.03, y: -5 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.08,
+                  ease: "easeOut",
+                }}
               >
-                {/* Imagem */}
                 <div className="relative w-full h-full">
                   <Image
                     src={activity.image}
@@ -102,15 +111,15 @@ export default function ActivitiesSection() {
 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white transform transition-transform duration-300 group-hover:-translate-y-5">
-                    <div className="mb-3">
-                      <span className="inline-block px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded-full backdrop-blur-sm">
-                        Actividade Missionária
-                      </span>
-                    </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white transition-transform duration-300 group-hover:-translate-y-5">
+                    <span className="inline-block mb-3 px-3 py-1 bg-yellow-500 text-xs font-semibold rounded-full">
+                      Actividade Missionária
+                    </span>
+
                     <h3 className="text-2xl font-bold mb-3">
                       {activity.title}
                     </h3>
+
                     <p className="text-gray-200 text-sm leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
                       {activity.description}
                     </p>

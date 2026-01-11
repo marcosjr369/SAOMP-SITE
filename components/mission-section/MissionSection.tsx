@@ -33,7 +33,6 @@ export default function MissionSection() {
   return (
     <section className="py-8 bg-white">
       <div className="max-w-7xl mx-auto px-6 text-center">
-        {/* Título */}
         <motion.h2
           className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
           initial={{ opacity: 0, y: 20 }}
@@ -44,7 +43,6 @@ export default function MissionSection() {
           Nossa Missão
         </motion.h2>
 
-        {/* Subtítulo */}
         <motion.p
           className="text-gray-600 text-lg mb-12"
           initial={{ opacity: 0 }}
@@ -55,7 +53,6 @@ export default function MissionSection() {
           Descubra os pilares que guiam nossa ação missionária.
         </motion.p>
 
-        {/* Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {missionItems.map((item, idx) => {
             const Icon = item.icon;
@@ -68,15 +65,12 @@ export default function MissionSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: idx * 0.2 }}
               >
-                {/* Ícone */}
                 <div className="bg-yellow-100 p-4 rounded-full mb-4">
                   <Icon className="text-yellow-500 w-8 h-8" />
                 </div>
-                {/* Título */}
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   {item.title}
                 </h3>
-                {/* Descrição */}
                 <p className="text-gray-600">{item.description}</p>
               </motion.div>
             );

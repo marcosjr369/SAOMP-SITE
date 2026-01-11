@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Heart, Cross, Globe, Quote } from "lucide-react";
+import { Quote } from "lucide-react";
 
 const MissionQuoteSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -30,12 +30,10 @@ const MissionQuoteSection = () => {
       ref={sectionRef}
       className="relative py-12 px-4 md:px-8 bg-linear-to-b from-white to-gray-50 overflow-hidden"
     >
-      {/* Elementos decorativos */}
       <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-100 rounded-full opacity-20 -translate-x-16 -translate-y-8" />
       <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-100 rounded-full opacity-20 translate-x-20 translate-y-16" />
 
       <div className="max-w-6xl mx-auto">
-        {/* Citação Principal */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}

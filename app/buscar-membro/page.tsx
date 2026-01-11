@@ -52,7 +52,7 @@ export default function BuscaMembros() {
     <section className="min-h-screen bg-gray-50 py-12 px-4 mt-16">
       <div className="max-w-6xl mx-auto space-y-10">
         <header className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-gray-800">Buscar Membros</h1>
+          <h1 className="text-4xl font-bold text-gray-800">Buscar membros</h1>
           <p className="text-gray-600">Pesquise por nome, obra ou tipo de membro</p>
         </header>
 

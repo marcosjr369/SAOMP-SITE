@@ -11,7 +11,6 @@ export default function DocumentsSection() {
   return (
     <section className="py-20 bg-yellow-50">
       <div className="max-w-7xl mx-auto px-6 text-center">
-        {/* Cabeçalho chamativo */}
         <motion.div
           className="mb-8"
           initial={{ opacity: 0, y: 20 }}

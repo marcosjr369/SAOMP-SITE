@@ -14,26 +14,25 @@ const categories = [
   "Juventude",
 ];
 
-const images = [
-  { src: "/movimento.jpeg", title: "Evangelização 1", category: "Evangelização" },
-  { src: "/movimento2.jpeg", title: "Ação Social 1", category: "Ação Social" },
-  { src: "/movimento3.jpeg", title: "Formação 1", category: "Formação" },
-  { src: "/movimento4.jpeg", title: "Juventude 1", category: "Juventude" },
-  { src: "/movimento5.jpeg", title: "Evangelização 2", category: "Evangelização" },
-  { src: "/movimento6.jpeg", title: "Ação Social 2", category: "Ação Social" },
-  { src: "/movimento7.jpeg", title: "Formação 2", category: "Formação" },
-  { src: "/movimento9.jpeg", title: "Evangelização 3", category: "Evangelização" },
-  { src: "/movimento10.jpeg", title: "Juventude Missionária", category: "Juventude" },
-  { src: "/movimento11.jpeg", title: "Ação Social 3", category: "Ação Social" },
-  { src: "/movimento12.jpeg", title: "Ação Social 4", category: "Ação Social" },
-  { src: "/movimento13.jpeg", title: "Evangelização 4", category: "Evangelização" },
-  { src: "/movimento14.jpeg", title: "Formação do Clero", category: "Formação" },
-  { src: "/movimento15.jpeg", title: "Missão Comunitária", category: "Evangelização" },
-];
+const images = Array.from({ length: 38 }, (_, i) => {
+  const index = i + 1;
+
+  const categoryMap = ["Evangelização", "Ação Social", "Formação", "Juventude"];
+
+  const category = categoryMap[i % categoryMap.length];
+
+  return {
+    src: `/movimento${index === 1 ? "" : index}.jpeg`,
+    title: `${category} ${index}`,
+    category,
+  };
+});
 
 export default function GaleriaPage() {
   const [activeCategory, setActiveCategory] = useState("Todas");
-  const [selectedImage, setSelectedImage] = useState<null | (typeof images)[0]>(null);
+  const [selectedImage, setSelectedImage] = useState<null | (typeof images)[0]>(
+    null
+  );
 
   const filteredImages =
     activeCategory === "Todas"
@@ -52,6 +51,7 @@ export default function GaleriaPage() {
           priority
         />
         <div className="absolute inset-0 bg-black/60" />
+
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -67,7 +67,6 @@ export default function GaleriaPage() {
           </p>
         </motion.div>
       </div>
-
       <div className="max-w-7xl mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0 }}
@@ -96,7 +95,7 @@ export default function GaleriaPage() {
           className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         >
           <AnimatePresence>
-            {filteredImages.map((img, index) => (
+            {filteredImages.map((img) => (
               <motion.div
                 layout
                 key={img.src}
@@ -115,6 +114,7 @@ export default function GaleriaPage() {
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+
                   <div className="absolute bottom-0 left-0 right-0 p-4 text-white translate-y-6 group-hover:translate-y-0 transition-transform">
                     <h3 className="font-bold text-lg">{img.title}</h3>
                     <span className="text-xs text-gray-200">
@@ -149,6 +149,7 @@ export default function GaleriaPage() {
               >
                 <X size={28} />
               </button>
+
               <div className="relative h-[70vh] rounded-2xl overflow-hidden">
                 <Image
                   src={selectedImage.src}
@@ -158,7 +159,9 @@ export default function GaleriaPage() {
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-6 text-white">
                   <h3 className="text-2xl font-bold">{selectedImage.title}</h3>
-                  <p className="text-sm text-gray-200">{selectedImage.category}</p>
+                  <p className="text-sm text-gray-200">
+                    {selectedImage.category}
+                  </p>
                 </div>
               </div>
             </motion.div>

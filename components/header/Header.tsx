@@ -36,8 +36,6 @@ export default function Header() {
         )}
       >
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
             <div className="relative w-10 h-10 rounded-full overflow-hidden">
               <Image
@@ -50,8 +48,6 @@ export default function Header() {
             </div>
             <span className="text-lg font-bold text-gray-900">SAOMP</span>
           </Link>
-
-          {/* Desktop Menu */}
           <nav className="hidden lg:flex items-center gap-6">
             {navItems.map((item) => (
               <Link
@@ -83,7 +79,6 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* Mobile Toggle */}
           <button
             aria-label="Abrir menu"
             aria-expanded={open}
@@ -95,7 +90,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Overlay */}
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -103,11 +97,12 @@ export default function Header() {
         />
       )}
 
-      {/* Mobile Menu */}
       <div
         className={cn(
           "lg:hidden fixed top-16 left-0 w-full bg-white/95 backdrop-blur-md border-b transition-all duration-300",
-          open ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
+          open
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-2 pointer-events-none"
         )}
       >
         <nav className="px-6 py-6 flex flex-col gap-4">
