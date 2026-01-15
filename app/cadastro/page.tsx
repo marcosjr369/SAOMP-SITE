@@ -13,200 +13,308 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, AlertTriangle } from "lucide-react";
+
+const API_URL = "https://saomp-back.vercel.app/api";
+
+type FormData = {
+  nome: string;
+  email: string;
+  telefone: string;
+  nascimento: string;
+  genero: string;
+  obra: string;
+  vigararia: string;
+  paroquia: string;
+  anoAdmissao: string;
+  tipoMembro: string;
+};
+
+const initialState: FormData = {
+  nome: "",
+  email: "",
+  telefone: "",
+  nascimento: "",
+  genero: "",
+  obra: "",
+  vigararia: "",
+  paroquia: "",
+  anoAdmissao: "",
+  tipoMembro: "",
+};
 
 export default function CadastroMembro() {
-  const [formData, setFormData] = useState({
-    nome: "",
-    email: "",
-    telefone: "",
-    nascimento: "",
-    genero: "",
-    obra: "",
-    vigararia: "",
-    paroquia: "",
-    anoAdmissao: "",
-    tipoMembro: "",
-  });
-
+  const [formData, setFormData] = useState<FormData>(initialState);
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (field: string, value: string) => {
+  function handleChange(field: keyof FormData, value: string) {
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+  }
 
-  const isFormValid = () => {
-    return Object.values(formData).every((value) => value !== "");
-  };
+  function isFormValid() {
+    return Object.values(formData).every((v) => v.trim() !== "");
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setSuccess(false);
 
     if (!isFormValid()) {
-      console.warn("Formulário incompleto:", formData);
+      setError("Preencha todos os campos obrigatórios.");
       return;
     }
 
-    console.group("📋 Dados do Membro Cadastrado");
-    Object.entries(formData).forEach(([key, value]) => {
-      console.log(`${key}:`, value);
-    });
-    console.groupEnd();
+    setLoading(true);
 
-    setSuccess(true);
-  };
+    try {
+      const payload = {
+        nome: formData.nome,
+        email: formData.email,
+        telefone: Number(formData.telefone),
+        nascimento: new Date(formData.nascimento).toISOString(),
+        genero: formData.genero,
+        obra: formData.obra,
+        vigararia: formData.vigararia,
+        paroquia: formData.paroquia,
+        anoAdmissao: new Date(`${formData.anoAdmissao}-01-01`).toISOString(),
+        tipoMembro: formData.tipoMembro,
+      };
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Erro ao cadastrar membro");
+      }
+
+      setSuccess(true);
+      setFormData(initialState);
+    } catch (err: any) {
+      setError(err.message || "Erro inesperado");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
-    <section className="min-h-screen bg-gray-50 py-10 px-4 mt-16">
+    <section className="min-h-screen bg-gray-50 py-12 px-4 mt-16">
       <div className="max-w-3xl mx-auto space-y-6">
         {success && (
           <Card className="border-green-200 bg-green-50">
-            <CardContent className="p-6 flex gap-4 items-start">
-              <CheckCircle className="text-green-600 mt-1" size={28} />
+            <CardContent className="p-5 flex gap-3">
+              <CheckCircle className="text-green-600" size={26} />
               <div>
-                <h3 className="font-semibold text-green-800 text-lg">
+                <h3 className="font-semibold text-green-800">
                   Membro cadastrado com sucesso
                 </h3>
-                <p className="text-sm text-green-700 mt-1">
-                  Os dados foram validados e registados corretamente.
+                <p className="text-sm text-green-700">
+                  Os dados foram enviados para o sistema.
                 </p>
               </div>
             </CardContent>
           </Card>
         )}
+        {error && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-5 flex gap-3">
+              <AlertTriangle className="text-red-600" size={26} />
+              <p className="text-red-700 font-medium">{error}</p>
+            </CardContent>
+          </Card>
+        )}
 
-        <div className="bg-white rounded-2xl shadow p-6 md:p-10">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Dados Pessoais & Missionários
-          </h1>
-          <p className="text-sm text-gray-500 mb-6">
-            Preencha todos os campos obrigatórios (*)
-          </p>
+        <Card className="shadow-lg rounded-2xl border-t border-yellow-500">
+          <CardContent className="p-8 md:p-10">
+            <h1 className="text-4xl text-center font-bold text-gray-800">
+              Cadastro de Membro
+            </h1>
+            <p className="text-sm text-gray-500 mb-8 text-center">
+              Torna-se membro das Obras Missionárias Pontifícias
+            </p>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Dados Pessoais */}
-            <div>
-              <h2 className="font-semibold text-lg text-gray-700 mb-4">
-                Dados Pessoais
-              </h2>
+            <form onSubmit={handleSubmit} className="space-y-10">
+              <div>
+                <h2 className="font-semibold text-lg mb-4 text-gray-700">
+                  Dados Pessoais
+                </h2>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Nome Completo *</Label>
-                  <Input placeholder="Seu nome" onChange={(e) => handleChange("nome", e.target.value)} />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Field label="Nome">
+                    <Input
+                      value={formData.nome}
+                      onChange={(e) => handleChange("nome", e.target.value)}
+                    />
+                  </Field>
+
+                  <Field label="Email">
+                    <Input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleChange("email", e.target.value)}
+                    />
+                  </Field>
+
+                  <Field label="Telefone">
+                    <Input
+                      value={formData.telefone}
+                      onChange={(e) => handleChange("telefone", e.target.value)}
+                    />
+                  </Field>
+
+                  <Field label="Data de Nascimento">
+                    <Input
+                      type="date"
+                      value={formData.nascimento}
+                      onChange={(e) =>
+                        handleChange("nascimento", e.target.value)
+                      }
+                    />
+                  </Field>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Email *</Label>
-                  <Input type="email" placeholder="exemplo@email.com" onChange={(e) => handleChange("email", e.target.value)} />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Telefone *</Label>
-                  <Input placeholder="+244 9..." onChange={(e) => handleChange("telefone", e.target.value)} />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Data de Nascimento *</Label>
-                  <Input type="date" onChange={(e) => handleChange("nascimento", e.target.value)} />
-                </div>
-              </div>
-
-              <div className="mt-4 space-y-2">
-                <Label>Gênero *</Label>
-                <RadioGroup className="flex gap-6 mt-2" onValueChange={(v) => handleChange("genero", v)}>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="Masculino" />
-                    <Label>Masculino</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="Feminino" />
-                    <Label>Feminino</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-
- 
-            <div>
-              <h2 className="font-semibold text-lg text-gray-700 mb-4">
-                Dados Missionários
-              </h2>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Obra Missionária *</Label>
-                  <Select onValueChange={(v) => handleChange("obra", v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a obra" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="IAM">Infância e Adolescência Missionária</SelectItem>
-                      <SelectItem value="Liga">Liga Missionária</SelectItem>
-                      <SelectItem value="Familia">Família Missionária</SelectItem>
-                      <SelectItem value="Uniao">União Missionária</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Vigararia *</Label>
-                  <Select onValueChange={(v) => handleChange("vigararia", v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a vigararia" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="São Pedro Apóstolo">São Pedro Apóstolo</SelectItem>
-                      <SelectItem value="Santo António">Santo António</SelectItem>
-                      <SelectItem value="Cazanga">São João Baptista da Cazanga</SelectItem>
-                      <SelectItem value="Calabria">São João Calábria</SelectItem>
-                      <SelectItem value="Lwanga">São Carlos Lwanga</SelectItem>
-                      <SelectItem value="Conceicao">Da Conceição</SelectItem>
-                      <SelectItem value="Fatima">Nossa Senhora de Fátima</SelectItem>
-                      <SelectItem value="Agostinho">Santo Agostinho</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Paróquia *</Label>
-                  <Input placeholder="Nome da Paróquia" onChange={(e) => handleChange("paroquia", e.target.value)} />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Ano de Admissão *</Label>
-                  <Input type="number" placeholder="Ex: 2021" onChange={(e) => handleChange("anoAdmissao", e.target.value)} />
+                <div className="mt-4">
+                  <Label>Gênero</Label>
+                  <RadioGroup
+                    className="flex gap-6 mt-2"
+                    value={formData.genero}
+                    onValueChange={(v) => handleChange("genero", v)}
+                  >
+                    <Option value="Masculino" />
+                    <Option value="Feminino" />
+                  </RadioGroup>
                 </div>
               </div>
 
-              <div className="mt-4 space-y-2">
-                <Label>Tipo de Membro *</Label>
-                <RadioGroup className="grid md:grid-cols-3 gap-4 mt-2" onValueChange={(v) => handleChange("tipoMembro", v)}>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="Oracao" />
-                    <Label>Membro de Oração</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="Promessa" />
-                    <Label>Membro com Promessa</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="Assessor" />
-                    <Label>Assessor</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
+              <div>
+                <h2 className="font-semibold text-lg mb-4 text-gray-700">
+                  Dados Missionários
+                </h2>
 
-            <Button
-              type="submit"
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white text-lg py-6 rounded-xl"
-            >
-              Cadastrar Membro
-            </Button>
-          </form>
-        </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <SelectField
+                    label="Etapa"
+                    value={formData.obra}
+                    onChange={(v) => handleChange("obra", v)}
+                    options={["IAM", "Liga Missionária", "Familia Missionária", "União Missionária"]}
+                  />
+
+                  <SelectField
+                    label="Vigararia"
+                    value={formData.vigararia}
+                    onChange={(v) => handleChange("vigararia", v)}
+                    options={[
+                      "São Pedro Apóstolo",
+                      "Santo António",
+                      "São João Baptista da Cazanga",
+                      "Nª Sª de Fátima",
+                      "Carlos Luanga",
+                      "São João Calabria",
+                      "Nª Sª da Conceição"
+                    ]}
+                  />
+
+                  <Field label="Paróquia">
+                    <Input
+                      value={formData.paroquia}
+                      onChange={(e) => handleChange("paroquia", e.target.value)}
+                    />
+                  </Field>
+
+                  <Field label="Ano de Admissão">
+                    <Input
+                      type="number"
+                      value={formData.anoAdmissao}
+                      onChange={(e) =>
+                        handleChange("anoAdmissao", e.target.value)
+                      }
+                    />
+                  </Field>
+                </div>
+
+                <div className="mt-4">
+                  <Label>Tipo de Membro</Label>
+                  <RadioGroup
+                    className="grid md:grid-cols-4 gap-2 mt-5"
+                    value={formData.tipoMembro}
+                    onValueChange={(v) => handleChange("tipoMembro", v)}
+                  >
+                    <Option value="Oracao" label="Oração" />
+                    <Option value="Promessa" />
+                    <Option value="Assessor" />
+                    <Option value="Director" />
+                  </RadioGroup>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white text-lg py-6 rounded-xl"
+              >
+                {loading ? "Cadastrando..." : "Cadastrar Membro"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );
 }
+
+function Field({ label, children }: any) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      {children}
+    </div>
+  );
+}
+
+function Option({ value, label }: any) {
+  return (
+    <div className="flex items-center gap-2">
+      <RadioGroupItem value={value} />
+      <Label>{label || value}</Label>
+    </div>
+  );
+}
+
+type SelectFieldProps = {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: string[];
+};
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+}: SelectFieldProps) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger>
+          <SelectValue placeholder={`Selecione ${label.toLowerCase()}`} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((o) => (
+            <SelectItem key={o} value={o}>
+              {o}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+

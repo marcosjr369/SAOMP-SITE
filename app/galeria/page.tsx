@@ -14,7 +14,7 @@ const categories = [
   "Juventude",
 ];
 
-const images = Array.from({ length: 38 }, (_, i) => {
+const images = Array.from({ length: 25 }, (_, i) => {
   const index = i + 1;
 
   const categoryMap = ["Evangelização", "Ação Social", "Formação", "Juventude"];

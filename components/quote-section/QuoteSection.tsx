@@ -1,94 +1,153 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { Quote } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Quote, ChevronLeft, ChevronRight } from "lucide-react";
 
-const MissionQuoteSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
+const quotes = [
+  {
+    text: "No coração da Igreja, minha Mãe, eu serei o amor.",
+    author: "Santa Teresinha do Menino Jesus",
+  },
+  {
+    text: "Muitos perdem a fé por falta de missionários.",
+    author: "São Francisco Xavier",
+  },
+  {
+    text: "A minha vocação é o amor.",
+    author: "Santa Teresinha do Menino Jesus",
+  },
+
+  {
+    text: "Ai de mim se não anunciar o Evangelho!",
+    author: "São Francisco Xavier",
+  },
+  { text: "Tudo é graça.", author: "Santa Teresinha do Menino Jesus" },
+  {
+    text: "O amor de Deus impele-me a ir mais longe.",
+    author: "São Francisco Xavier",
+  },
+  {
+    text: "Quero passar o meu céu fazendo o bem sobre a terra.",
+    author: "Santa Teresinha do Menino Jesus",
+  },
+  {
+    text: "Senhor, dá-me almas, fica com o resto.",
+    author: "São Francisco Xavier",
+  },
+  {
+    text: "Não é suficiente atravessar os mares, é preciso atravessar os corações.",
+    author: "São Francisco Xavier",
+  },
+  {
+    text: "A santidade consiste em pequenas coisas feitas com grande amor.",
+    author: "Santa Teresinha do Menino Jesus",
+  },
+  {
+    text: "Quantas almas se perdem por falta de quem as anuncie Jesus Cristo.",
+    author: "São Francisco Xavier",
+  },
+  {
+    text: "A confiança e nada mais que a confiança deve conduzir-nos ao amor.",
+    author: "Santa Teresinha do Menino Jesus",
+  },
+  {
+    text: "Onde houver maior necessidade, aí deve estar o missionário.",
+    author: "São Francisco Xavier",
+  },
+  {
+    text: "Não posso crescer, tenho de suportar-me como sou, com todas as minhas imperfeições.",
+    author: "Santa Teresinha do Menino Jesus",
+  },
+  {
+    text: "A missão nasce do amor e conduz ao sacrifício.",
+    author: "São Francisco Xavier",
+  },
+  {
+    text: "A oração é um impulso do coração, um simples olhar lançado ao céu.",
+    author: "Santa Teresinha do Menino Jesus",
+  },
+  {
+    text: "Prefiro morrer no campo da missão do que viver sem anunciar Cristo.",
+    author: "São Francisco Xavier",
+  },
+  {
+    text: "Compreendi que o amor encerra todas as vocações.",
+    author: "Santa Teresinha do Menino Jesus",
+  },
+    {
+    text: "Quem ama verdadeiramente a Deus não teme o cansaço nem o sofrimento.",
+    author: "São Francisco Xavier",
+  },
+  {
+    text: "Mesmo no sofrimento, posso escolher amar.",
+    author: "Santa Teresinha do Menino Jesus",
+  },
+];
+
+export default function MissionQuoteSection() {
+  const [index, setIndex] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const next = () => setIndex((prev) => (prev + 1) % quotes.length);
+  const prev = () =>
+    setIndex((prev) => (prev - 1 + quotes.length) % quotes.length);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+    timeoutRef.current = setTimeout(next, 5000);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [index]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative py-12 px-4 md:px-8 bg-linear-to-b from-white to-gray-50 overflow-hidden"
-    >
-      <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-100 rounded-full opacity-20 -translate-x-16 -translate-y-8" />
-      <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-100 rounded-full opacity-20 translate-x-20 translate-y-16" />
+    <section className="relative py-16 px-4 bg-linear-to-b from-white to-gray-50 overflow-hidden">
+      <div className="max-w-5xl mx-auto text-center relative">
+        <Quote className="mx-auto w-12 h-12 text-yellow-400 mb-6 opacity-60" />
 
-      <div className="max-w-6xl mx-auto">
+        <AnimatePresence mode="wait">
+          <motion.blockquote
+            key={index}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ duration: 0.6 }}
+            className="text-2xl md:text-3xl lg:text-4xl font-serif italic text-gray-800 leading-relaxed px-6"
+          >
+            “{quotes[index].text}”
+          </motion.blockquote>
+        </AnimatePresence>
+
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative mb-16"
+          key={quotes[index].author}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-8"
         >
-          <div className="flex flex-col items-center text-center">
-            <Quote className="w-12 h-12 text-yellow-400 mb-6 opacity-50" />
-
-            <div className="relative max-w-3xl mx-auto">
-              <div className="absolute -top-6 -left-6 text-6xl text-yellow-300 opacity-30">
-                "
-              </div>
-
-              <motion.blockquote
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-2xl md:text-3xl lg:text-4xl font-serif italic text-gray-800 leading-relaxed mb-6 px-4"
-              >
-                Eu quisera percorrer a terra, pregar o teu nome e plantar no
-                solo
-                <span className="text-yellow-600 font-semibold">
-                  {" "}
-                  infiel a tua cruz gloriosa
-                </span>
-                .
-              </motion.blockquote>
-
-              <div className="absolute -bottom-6 -right-6 text-6xl text-yellow-300 opacity-30 rotate-180">
-                "
-              </div>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={isVisible ? { opacity: 1 } : {}}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className="mt-8 flex flex-col items-center"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-1 h-8 bg-yellow-500 rounded-full" />
-                <h3 className="text-xl font-semibold text-gray-700">
-                  Santa Teresinha do Menino Jesus
-                </h3>
-              </div>
-              <p className="text-gray-500 font-medium bg-yellow-50 px-4 py-2 rounded-full">
-                Padroeira das Missões
-              </p>
-            </motion.div>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-700">
+            {quotes[index].author}
+          </h3>
         </motion.div>
+
+        <div className="mt-10 flex justify-center gap-6">
+          <button
+            onClick={prev}
+            className="p-3 rounded-full bg-yellow-100 hover:bg-yellow-200 transition"
+            aria-label="Frase anterior"
+          >
+            <ChevronLeft className="w-6 h-6 text-yellow-600" />
+          </button>
+
+          <button
+            onClick={next}
+            className="p-3 rounded-full bg-yellow-100 hover:bg-yellow-200 transition"
+            aria-label="Próxima frase"
+          >
+            <ChevronRight className="w-6 h-6 text-yellow-600" />
+          </button>
+        </div>
       </div>
     </section>
   );
-};
-
-export default MissionQuoteSection;
+}

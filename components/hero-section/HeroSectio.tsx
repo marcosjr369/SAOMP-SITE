@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Users, Church } from "lucide-react";
 import Link from "next/link";
 
-const images = Array.from({ length: 38 }, (_, i) => {
+const images = Array.from({ length: 25 }, (_, i) => {
   const index = i + 1;
   return `/movimento${index === 1 ? "" : index}.jpeg`;
 });

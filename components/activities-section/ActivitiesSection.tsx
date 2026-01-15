@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-const activities = Array.from({ length: 20 }, (_, i) => {
+const activities = Array.from({ length: 15 }, (_, i) => {
   const index = i + 1;
 
   const types = [

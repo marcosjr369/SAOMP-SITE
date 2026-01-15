@@ -10,7 +10,7 @@ const missionItems = [
     icon: Globe,
   },
   {
-    title: "Comunidade",
+    title: "Espiritualidade",
     description:
       "Unindo fiéis em oração e ação concreta de caridade.",
     icon: Users,

@@ -39,6 +39,50 @@ const documents = [
     pdf: "/documentos/Conhecendo as OMP Manual.pdf",
     logoText: "Conhecendo as OMP",
   },
+
+  {
+    title: "Ritual de Compromisso",
+    description: "Ritual de Compromisso Infância e Adolescência Missionária.",
+    pdf: "/documentos/Ritual de Compromisso Infância e Adolescência Missionária.pdf",
+    logoText: "Ritual de Compromisso",
+  },
+  {
+    title: "Ritual de Oração de Caminhada LMJ",
+    description: "Informações sobre o Ritual de Oração de Caminhada LMJ.",
+    pdf: "/documentos/Ritual de Oração de Caminhada LMJ.pdf",
+    logoText: "Ritual de Oração de Caminhada",
+  },
+  {
+    title: "Ritual de Promessa e renovação",
+    description: "Informações sobre o Ritual de Promessa e renovação LMJ",
+    pdf: "/documentos/Ritual de Promessa e renovação LMJ.pdf",
+    logoText: "Ritual de Promessa e renovação",
+  },
+  {
+    title: "10 compromissos da Infância e Adolescência Missionária",
+    description: "10 compromissos da Infância e Adolescência Missionária",
+    pdf: "/documentos/Os 10 compromissos da Infância e Adolescência Missionária.pdf",
+    logoText: "10 compromissos da Infância e Adolescência Missionária",
+  },
+
+  {
+    title: "Símbolos Missionários",
+    description: "Símbolos Missionários",
+    pdf: "/documentos/Símbolos Missionários .pdf",
+    logoText: "Símbolos Missionários",
+  },
+  {
+    title: "Os Decálogos da IAM",
+    description: "Os Decálogos da IAM",
+    pdf: "/documentos/Os Decálogos da Infância e Adolescência Missionária.pdf",
+    logoText: "Os Decálogos da IAM",
+  },
+  {
+    title: "As Quatro Áreas Integradas Metodologias da Infância Missionária",
+    description: "As Quatro Áreas Integradas Metodologias da Infância Missionária",
+    pdf: "/documentos/As Quatro Áreas Integradas Metodologias da Infância Missionária.pdf",
+    logoText: "Áreas Integradas Metodologias da Infância Missionária",
+  }
 ];
 
 export default function DocumentsPage() {
@@ -80,7 +124,7 @@ export default function DocumentsPage() {
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
             >
-              <div className="flex items-center justify-center h-32 bg-linear-to-r from-yellow-400 to-yellow-500 text-white text-xl font-bold shrink-0 transition-transform group-hover:scale-105">
+              <div className="flex items-center justify-center h-32 bg-linear-to-r from-yellow-400 to-yellow-500 text-white text-md md:text-xl px-5 font-bold shrink-0 transition-transform group-hover:scale-105">
                 {doc.logoText}
               </div>
               <div className="p-6 flex flex-col grow justify-between">

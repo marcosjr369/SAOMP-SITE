@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu, X, UserPlus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 const navItems = [
   { label: "Início", href: "/" },
@@ -16,6 +17,7 @@ const navItems = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const path = usePathname()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -53,10 +55,10 @@ export default function Header() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="relative text-gray-700 font-medium transition
+                className={`relative font-medium transition
                 hover:text-yellow-600 after:absolute after:left-0 after:-bottom-1
                 after:h-0.5 after:w-0 after:bg-yellow-500 after:transition-all
-                hover:after:w-full"
+                hover:after:w-full ${path == item.href ? "text-yellow-500 border-b-2 border-yellow-500" :"text-gray-700 " }`}
               >
                 {item.label}
               </Link>

@@ -49,7 +49,7 @@ const Footer = () => {
               {[Facebook, Instagram, Youtube].map((Icon, index) => (
                 <a
                   key={index}
-                  href="#"
+                  href="https://www.facebook.com/share/g/1F5eQGBjpA/?mibextid=wwXIfr"
                   className="p-2.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-300 hover:text-yellow-400 transition-all duration-300 transform hover:-translate-y-1"
                   aria-label="Redes sociais"
                 >
@@ -110,7 +110,7 @@ const Footer = () => {
                     href="tel:+244923456789"
                     className="text-sm text-gray-400 hover:text-yellow-400 transition-colors"
                   >
-                    +244 923 456 789
+                    +244 934 883 685
                   </a>
                 </div>
               </li>
@@ -125,7 +125,7 @@ const Footer = () => {
                     href="mailto:contato@saomp-luanda.org"
                     className="text-sm text-gray-400 hover:text-yellow-400 transition-colors break-all"
                   >
-                    contato@saomp-luanda.org
+                    saomp@ompluanda.com
                   </a>
                 </div>
               </li>
