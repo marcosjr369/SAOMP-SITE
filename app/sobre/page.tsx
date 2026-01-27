@@ -190,7 +190,6 @@ Iniciado em Nápoles em 1971, o processo para a causa da beatificação foi conc
   },
 ];
 
-// Definição das orações com arquivos de áudio
 const oracoes = [
   {
     title: "Credo Missionário",
@@ -217,7 +216,8 @@ const oracoes = [
     icon: FaMusic,
     description:
       "Missionário querido missionário,\nTestemunho darás ao teu Senhor,\nMissionário querido missionário\nSem vício amarrar o coração,\nMissionário querido missionário\nAo teu lado avançar, nós iremos\nPela vida anunciar a boa nova, a boa nova do Senhor.\n\n1. São Pedro contigo queremos,\nEntre os homens viver como vivestes\nNa tristeza, na paz e na alegria,\nEstou contigo no meu coração, coração.\n\n2. Levaremos Jesus no coração,\nE nas mãos a bandeira da esperança\nTestemunho do mundo de hoje\nLevaremos a sua missão, ó Senhor\n\n3. São Paulo contigo queremos,\nEntre os homens viver com muito amor,\nNa tristeza, na paz e na alegria,\nEstou contigo no meu coração, coração",
-    audioSrc: "/musicas/hino_nacional_da_liga_missionaria_juvenil_mp3_59009.mp3",
+    audioSrc:
+      "/musicas/hino_nacional_da_liga_missionaria_juvenil_mp3_59009.mp3",
     downloadName: "Hino Nacional da Liga Missionária Juvenil",
   },
   {
@@ -243,7 +243,7 @@ export default function SobrePage() {
 
   const toggleFullDescription = (
     index: number,
-    type: "padroeiro" | "fundador"
+    type: "padroeiro" | "fundador",
   ) => {
     const key = `${type}-${index}`;
     setShowFullDescription((prev) => ({
@@ -254,7 +254,6 @@ export default function SobrePage() {
 
   const handleAudioToggle = (index: number) => {
     if (currentAudio === index) {
-      // Toggle play/pause
       if (audioRef.current) {
         if (isPlaying) {
           audioRef.current.pause();
@@ -265,14 +264,12 @@ export default function SobrePage() {
         }
       }
     } else {
-      // Stop current and play new
       if (audioRef.current) {
         audioRef.current.pause();
       }
       setCurrentAudio(index);
       setIsPlaying(true);
-      
-      // Play new audio after a small delay to ensure ref is updated
+
       setTimeout(() => {
         if (audioRef.current) {
           audioRef.current.play();
@@ -282,7 +279,7 @@ export default function SobrePage() {
   };
 
   const handleDownload = (audioSrc: string, downloadName: string) => {
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = audioSrc;
     link.download = `${downloadName}.mp3`;
     document.body.appendChild(link);
@@ -292,7 +289,6 @@ export default function SobrePage() {
 
   return (
     <section className="bg-gray-50 flex flex-col justify-center items-center">
-      {/* Audio player (hidden) */}
       <audio
         ref={audioRef}
         onEnded={() => {
@@ -301,10 +297,14 @@ export default function SobrePage() {
         onPause={() => {
           setIsPlaying(false);
         }}
-        src={currentAudio !== null && oracoes[currentAudio]?.audioSrc ? oracoes[currentAudio].audioSrc : ""}
+        src={
+          currentAudio !== null && oracoes[currentAudio]?.audioSrc
+            ? oracoes[currentAudio].audioSrc
+            : ""
+        }
       />
 
-      <div className="relative h-[60vh] w-full flex flex-col justify-center items-center">
+      <div className="relative h-[50vh] w-full flex flex-col justify-center items-center">
         <Image
           src="/movimento12.jpeg"
           alt="Obras Missionárias Pontifícias"
@@ -631,8 +631,8 @@ export default function SobrePage() {
                                 {fundador.name.includes("Paulo Manna")
                                   ? "Beato"
                                   : fundador.name.includes("Paulina")
-                                  ? "Venerável"
-                                  : "Servo(a) de Deus"}
+                                    ? "Venerável"
+                                    : "Servo(a) de Deus"}
                               </span>
                             </div>
                             {fundador.name.includes("Paulo Manna") && (
@@ -796,8 +796,6 @@ export default function SobrePage() {
                             {oracao.description}
                           </p>
                         </div>
-
-                        {/* Controles de áudio para as últimas 3 orações */}
                         {oracao.audioSrc && (
                           <div className="mt-6 pt-6 border-t border-gray-100">
                             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
@@ -814,7 +812,7 @@ export default function SobrePage() {
                                   </p>
                                 </div>
                               </div>
-                              
+
                               <div className="flex items-center gap-3">
                                 <button
                                   onClick={() => handleAudioToggle(index)}
@@ -832,9 +830,14 @@ export default function SobrePage() {
                                     </>
                                   )}
                                 </button>
-                                
+
                                 <button
-                                  onClick={() => handleDownload(oracao.audioSrc, oracao.downloadName || oracao.title)}
+                                  onClick={() =>
+                                    handleDownload(
+                                      oracao.audioSrc,
+                                      oracao.downloadName || oracao.title,
+                                    )
+                                  }
                                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                 >
                                   <FaDownload className="w-4 h-4" />
@@ -842,10 +845,13 @@ export default function SobrePage() {
                                 </button>
                               </div>
                             </div>
-                            
+
                             <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
                               <p className="font-medium mb-1">Informação:</p>
-                              <p>Esta música pode ser usada em encontros missionários, celebrações e momentos de oração.</p>
+                              <p>
+                                Esta música pode ser usada em encontros
+                                missionários, celebrações e momentos de oração.
+                              </p>
                             </div>
                           </div>
                         )}
