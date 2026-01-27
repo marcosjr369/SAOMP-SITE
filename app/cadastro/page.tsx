@@ -13,7 +13,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, AlertTriangle } from "lucide-react";
+import {
+  CheckCircle,
+  AlertTriangle,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 
 const API_URL = "https://saomp-back.vercel.app/api";
 
@@ -48,6 +54,10 @@ export default function CadastroMembro() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showYearPicker, setShowYearPicker] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear(),
+  );
 
   function handleChange(field: keyof FormData, value: string) {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -56,6 +66,59 @@ export default function CadastroMembro() {
   function isFormValid() {
     return Object.values(formData).every((v) => v.trim() !== "");
   }
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
+  const months = [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro",
+  ];
+
+  function handleDateSelect(day: number, month: number, year: number) {
+    const monthStr = (month + 1).toString().padStart(2, "0");
+    const dayStr = day.toString().padStart(2, "0");
+    const dateStr = `${year}-${monthStr}-${dayStr}`;
+    handleChange("nascimento", dateStr);
+    setShowYearPicker(false);
+  }
+
+  function getDaysInMonth(month: number, year: number) {
+    return new Date(year, month + 1, 0).getDate();
+  }
+
+  function getCurrentDateValues() {
+    if (!formData.nascimento) {
+      const today = new Date();
+      return {
+        year: today.getFullYear(),
+        month: today.getMonth(),
+        day: today.getDate(),
+      };
+    }
+
+    const date = new Date(formData.nascimento);
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth(),
+      day: date.getDate(),
+    };
+  }
+
+  const {
+    year: currentYearValue,
+    month: currentMonthValue,
+    day: currentDayValue,
+  } = getCurrentDateValues();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -168,15 +231,179 @@ export default function CadastroMembro() {
                     />
                   </Field>
 
-                  <Field label="Data de Nascimento">
-                    <Input
-                      type="date"
-                      value={formData.nascimento}
-                      onChange={(e) =>
-                        handleChange("nascimento", e.target.value)
-                      }
-                    />
-                  </Field>
+                  <div className="space-y-2">
+                    <Label>Data de Nascimento</Label>
+                    <div className="relative">
+                      <div className="flex items-center gap-2">
+                        <Calendar
+                          className="absolute left-3 text-gray-400"
+                          size={20}
+                        />
+                        <Input
+                          type="date"
+                          value={formData.nascimento}
+                          onChange={(e) =>
+                            handleChange("nascimento", e.target.value)
+                          }
+                          className="pl-10"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowYearPicker(!showYearPicker)}
+                          className="md:hidden px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg border text-sm font-medium"
+                        >
+                          {showYearPicker ? "Ocultar" : "Ano"}
+                        </button>
+                      </div>
+
+                      {showYearPicker && (
+                        <div className="absolute z-50 mt-2 w-full bg-white border rounded-lg shadow-lg p-4">
+                          <div className="flex justify-between items-center mb-4">
+                            <h3 className="font-semibold">Selecionar Ano</h3>
+                            <button
+                              type="button"
+                              onClick={() => setShowYearPicker(false)}
+                              className="text-gray-500 hover:text-gray-700"
+                            >
+                              ✕
+                            </button>
+                          </div>
+
+                          <div className="flex items-center justify-between mb-3">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSelectedYear((prev) => prev - 10)
+                              }
+                              className="p-2 hover:bg-gray-100 rounded"
+                            >
+                              <ChevronUp size={20} />
+                            </button>
+                            <span className="text-lg font-bold">
+                              {selectedYear}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSelectedYear((prev) => prev + 10)
+                              }
+                              className="p-2 hover:bg-gray-100 rounded"
+                            >
+                              <ChevronDown size={20} />
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto">
+                            {years
+                              .filter((y) => Math.abs(y - selectedYear) <= 5)
+                              .map((year) => (
+                                <button
+                                  key={year}
+                                  type="button"
+                                  onClick={() => {
+                                    const newDate = new Date(
+                                      currentYearValue,
+                                      currentMonthValue,
+                                      currentDayValue,
+                                    );
+                                    newDate.setFullYear(year);
+                                    handleDateSelect(
+                                      currentDayValue,
+                                      currentMonthValue,
+                                      year,
+                                    );
+                                  }}
+                                  className={`p-3 text-center rounded-lg border ${
+                                    year === currentYearValue
+                                      ? "bg-yellow-100 border-yellow-500 text-yellow-800"
+                                      : "hover:bg-gray-100"
+                                  }`}
+                                >
+                                  {year}
+                                </button>
+                              ))}
+                          </div>
+
+                          <div className="mt-4 grid grid-cols-3 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const date = new Date(
+                                  currentYearValue - 18,
+                                  currentMonthValue,
+                                  currentDayValue,
+                                );
+                                handleDateSelect(
+                                  date.getDate(),
+                                  date.getMonth(),
+                                  date.getFullYear(),
+                                );
+                              }}
+                              className="p-2 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100"
+                            >
+                              -18 anos
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const date = new Date(
+                                  currentYearValue - 30,
+                                  currentMonthValue,
+                                  currentDayValue,
+                                );
+                                handleDateSelect(
+                                  date.getDate(),
+                                  date.getMonth(),
+                                  date.getFullYear(),
+                                );
+                              }}
+                              className="p-2 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100"
+                            >
+                              -30 anos
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="hidden md:block mt-4">
+                      <p className="text-sm text-gray-500 mb-2">
+                        Seleção rápida:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const date = new Date();
+                            date.setFullYear(date.getFullYear() - 18);
+                            handleDateSelect(
+                              date.getDate(),
+                              date.getMonth(),
+                              date.getFullYear(),
+                            );
+                          }}
+                          className="px-3 py-1 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 border"
+                        >
+                          18 anos atrás
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const date = new Date();
+                            date.setFullYear(date.getFullYear() - 30);
+                            handleDateSelect(
+                              date.getDate(),
+                              date.getMonth(),
+                              date.getFullYear(),
+                            );
+                          }}
+                          className="px-3 py-1 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 border"
+                        >
+                          30 anos atrás
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-4">
@@ -202,7 +429,12 @@ export default function CadastroMembro() {
                     label="Etapa"
                     value={formData.obra}
                     onChange={(v) => handleChange("obra", v)}
-                    options={["IAM", "Liga Missionária", "Familia Missionária", "União Missionária"]}
+                    options={[
+                      "IAM",
+                      "Liga Missionária",
+                      "Familia Missionária",
+                      "União Missionária",
+                    ]}
                   />
 
                   <SelectField
@@ -216,7 +448,7 @@ export default function CadastroMembro() {
                       "Nª Sª de Fátima",
                       "Carlos Luanga",
                       "São João Calabria",
-                      "Nª Sª da Conceição"
+                      "Nª Sª da Conceição",
                     ]}
                   />
 
@@ -293,12 +525,7 @@ type SelectFieldProps = {
   options: string[];
 };
 
-function SelectField({
-  label,
-  value,
-  onChange,
-  options,
-}: SelectFieldProps) {
+function SelectField({ label, value, onChange, options }: SelectFieldProps) {
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
@@ -317,4 +544,3 @@ function SelectField({
     </div>
   );
 }
-

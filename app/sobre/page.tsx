@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   FaPray,
   FaBook,
@@ -10,6 +10,10 @@ import {
   FaChevronUp,
   FaHistory,
   FaUserFriends,
+  FaPlay,
+  FaPause,
+  FaDownload,
+  FaMusic,
 } from "react-icons/fa";
 
 const obras = [
@@ -186,6 +190,7 @@ Iniciado em Nápoles em 1971, o processo para a causa da beatificação foi conc
   },
 ];
 
+// Definição das orações com arquivos de áudio
 const oracoes = [
   {
     title: "Credo Missionário",
@@ -199,6 +204,30 @@ const oracoes = [
     description:
       "Pai dos mais de seis bilhões de pessoas que povoam a terra. Que estais no Céu. Na nossa família, no nosso país e em todo mundo. Santificado seja o Vosso nome. Sobretudo na pessoa do mais pobre e dos abandonados. Venha a nós o vosso reino. E aos irmãos dos cinco continente, sobretudo os que não vos conhecem. Seja feita a vossa vontade assim na terra como no Céu. Para que todos vivam na justiça, na paz, no amor e sigam pelo caminho da verdade.",
   },
+  {
+    title: "Hino da IAM",
+    icon: FaMusic,
+    description:
+      "Vida abundante ao mundo ofereço\nQuero acender a chama do amor\nSou missionário e mesmo pequeno\nSirvo alegre ao Reino de Deus\nMãe de Jesus e das crianças\nQue mais precisam do nosso amor\nAcolhe a todos sob Teu manto\nGuia-nos sempre para o Senhor\nSeguindo os passos do Padroeiro\nVamos a vida inteira doar\nComo Francisco e Teresinha\nNossa missão é Cristo anunciar\nCom alegria construiremos, Senhor Jesus\nTeu Reino de Amor!\nA Boa Nova anunciaremos com nossa vida\nEm Teu nome, Senhor!",
+    audioSrc: "/musicas/01_hino_da_infancia_missionaria_mp3_59082.mp3",
+    downloadName: "Hino da Infância Missionária",
+  },
+  {
+    title: "Hino da Liga Missionária",
+    icon: FaMusic,
+    description:
+      "Missionário querido missionário,\nTestemunho darás ao teu Senhor,\nMissionário querido missionário\nSem vício amarrar o coração,\nMissionário querido missionário\nAo teu lado avançar, nós iremos\nPela vida anunciar a boa nova, a boa nova do Senhor.\n\n1. São Pedro contigo queremos,\nEntre os homens viver como vivestes\nNa tristeza, na paz e na alegria,\nEstou contigo no meu coração, coração.\n\n2. Levaremos Jesus no coração,\nE nas mãos a bandeira da esperança\nTestemunho do mundo de hoje\nLevaremos a sua missão, ó Senhor\n\n3. São Paulo contigo queremos,\nEntre os homens viver com muito amor,\nNa tristeza, na paz e na alegria,\nEstou contigo no meu coração, coração",
+    audioSrc: "/musicas/hino_nacional_da_liga_missionaria_juvenil_mp3_59009.mp3",
+    downloadName: "Hino Nacional da Liga Missionária Juvenil",
+  },
+  {
+    title: "Hino da Família Missionária",
+    icon: FaMusic,
+    description:
+      "Que nenhuma família\nComece em qualquer de repente\nQue nenhuma família\nTermine por falta de amor\nQue o casal seja um para o outro\nDe corpo e de mente\nE que nada no mundo\nSepare um casal sonhador\n\nQue nenhuma família\nSe abrigue debaixo da ponte\nQue ninguém interfira\nNo lar e na vida dos dois\nQue ninguém os obrigue a viver\nSem nenhum horizonte\nQue eles vivam do ontem, no hoje\nEm função de um depois\n\nQue a família comece\nE termine sabendo onde vai\nE que o homem carregue nos ombros\nA graça de um pai\nQue a mulher seja um céu de ternura\nAconchego e calor\nE que os filhos conheçam\nA força que brota do amor\n\nAbençoa, senhor, as famílias, amém\nAbençoa, senhor, a minha também\nAbençoa, senhor, as famílias, amém\nAbençoa, senhor, a minha também\n\nQue marido e mulher\nTenham força de amar sem medida\nQue ninguém vá dormir\nSem pedir ou sem dar seu perdão\nQue as crianças aprendam no colo\nO sentido da vida\nQue a família celebre a partilha\nDo abraço e do pão\n\nQue marido e mulher não se traiam\nNem traiam seus filhos\nQue o ciúme não mate a certeza\nDo amor entre os dois\nQue no seu firmamento\nA estrela que tem maior brilho\nSeja a firme esperança\nDe um céu, aqui mesmo e depois\n\nQue a família comece\nE termine sabendo onde vai\nE que o homem carregue nos ombros\nA graça de um pai\nQue a mulher seja um céu de ternura\nAconchego e calor\nE que os filhos conheçam\nA força que brota do amor\n\nAbençoa, senhor, as famílias, amém\nAbençoa, senhor, a minha também\nAbençoa, senhor, as famílias, amém\nAbençoa, senhor, a minha também",
+    audioSrc: "/musicas/oracao_pela_familia_padre_zezinho_mp3_62677.mp3",
+    downloadName: "Oração pela Família (Padre Zezinho)",
+  },
 ];
 
 export default function SobrePage() {
@@ -208,6 +237,9 @@ export default function SobrePage() {
   const [showFullDescription, setShowFullDescription] = useState<
     Record<string, boolean>
   >({});
+  const [currentAudio, setCurrentAudio] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const toggleFullDescription = (
     index: number,
@@ -220,8 +252,58 @@ export default function SobrePage() {
     }));
   };
 
+  const handleAudioToggle = (index: number) => {
+    if (currentAudio === index) {
+      // Toggle play/pause
+      if (audioRef.current) {
+        if (isPlaying) {
+          audioRef.current.pause();
+          setIsPlaying(false);
+        } else {
+          audioRef.current.play();
+          setIsPlaying(true);
+        }
+      }
+    } else {
+      // Stop current and play new
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      setCurrentAudio(index);
+      setIsPlaying(true);
+      
+      // Play new audio after a small delay to ensure ref is updated
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.play();
+        }
+      }, 100);
+    }
+  };
+
+  const handleDownload = (audioSrc: string, downloadName: string) => {
+    const link = document.createElement('a');
+    link.href = audioSrc;
+    link.download = `${downloadName}.mp3`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <section className="bg-gray-50 flex flex-col justify-center items-center">
+      {/* Audio player (hidden) */}
+      <audio
+        ref={audioRef}
+        onEnded={() => {
+          setIsPlaying(false);
+        }}
+        onPause={() => {
+          setIsPlaying(false);
+        }}
+        src={currentAudio !== null && oracoes[currentAudio]?.audioSrc ? oracoes[currentAudio].audioSrc : ""}
+      />
+
       <div className="relative h-[60vh] w-full flex flex-col justify-center items-center">
         <Image
           src="/movimento12.jpeg"
@@ -295,6 +377,7 @@ export default function SobrePage() {
           </p>
         </motion.div>
       </div>
+
       <div className="max-w-5xl mx-auto px-6 py-16 w-full">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-2">
@@ -709,18 +792,74 @@ export default function SobrePage() {
                           </p>
                         </div>
                         <div className="prose prose-lg max-w-none">
-                          <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                          <p className="text-gray-700 leading-relaxed whitespace-pre-line mb-6">
                             {oracao.description}
                           </p>
                         </div>
-                        <div className="mt-6 pt-6 border-t border-gray-100">
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <oracao.icon className="w-4 h-4" />
-                            <span className="font-medium">
-                              Oração recomendada para todos os missionários
-                            </span>
+
+                        {/* Controles de áudio para as últimas 3 orações */}
+                        {oracao.audioSrc && (
+                          <div className="mt-6 pt-6 border-t border-gray-100">
+                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+                              <div className="flex items-center gap-3">
+                                <div className="p-3 bg-green-100 rounded-full">
+                                  <FaMusic className="w-5 h-5 text-green-600" />
+                                </div>
+                                <div>
+                                  <h4 className="font-semibold text-gray-800">
+                                    Ouça esta oração/canto
+                                  </h4>
+                                  <p className="text-sm text-gray-500">
+                                    {oracao.title} - Música missionária
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-3">
+                                <button
+                                  onClick={() => handleAudioToggle(index)}
+                                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                >
+                                  {currentAudio === index && isPlaying ? (
+                                    <>
+                                      <FaPause className="w-4 h-4" />
+                                      Pausar
+                                    </>
+                                  ) : (
+                                    <>
+                                      <FaPlay className="w-4 h-4" />
+                                      Ouvir
+                                    </>
+                                  )}
+                                </button>
+                                
+                                <button
+                                  onClick={() => handleDownload(oracao.audioSrc, oracao.downloadName || oracao.title)}
+                                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                  <FaDownload className="w-4 h-4" />
+                                  Baixar
+                                </button>
+                              </div>
+                            </div>
+                            
+                            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
+                              <p className="font-medium mb-1">Informação:</p>
+                              <p>Esta música pode ser usada em encontros missionários, celebrações e momentos de oração.</p>
+                            </div>
                           </div>
-                        </div>
+                        )}
+
+                        {!oracao.audioSrc && (
+                          <div className="mt-6 pt-6 border-t border-gray-100">
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                              <oracao.icon className="w-4 h-4" />
+                              <span className="font-medium">
+                                Oração recomendada para todos os missionários
+                              </span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </motion.div>
                   )}
