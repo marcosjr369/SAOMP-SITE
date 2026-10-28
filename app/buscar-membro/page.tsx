@@ -128,8 +128,11 @@ export default function BuscaMembros() {
           );
         }
 
-        const membrosFormatados: Membro[] = (data?.members ?? []).map(
-          (m: MembroApi) => ({
+        // A API devolve a lista diretamente; aceita também { members: [...] }
+        const lista: MembroApi[] = Array.isArray(data) ? data : (data?.members ?? []);
+
+        const membrosFormatados: Membro[] = lista.map(
+          (m) => ({
             nome: m.nome,
             email: m.email,
             telefone: String(m.telefone),

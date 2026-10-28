@@ -23,7 +23,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { MemberCard, themeFor } from "@/components/cadastro/MemberCard";
+import { MemberCard, memberNumber, themeFor } from "@/components/cadastro/MemberCard";
 
 const API_URL = "https://saomp-back.vercel.app/api";
 
@@ -132,16 +132,14 @@ function validate(step: number, d: FormData): Errors {
   return e;
 }
 
-// Número de membro legível, ex.: IAM-2026-4F7K2
-function memberNumber(d: FormData, id?: string) {
-  const sigla = themeFor(d.obra).sigla;
-  const base = id
-    ? id.slice(-5)
-    : Array.from(d.email + d.nome)
-        .reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7)
-        .toString(36)
-        .slice(-5);
-  return `${sigla}-${currentYear}-${base.toUpperCase()}`;
+// Sem id da API, usa um hash do email + nome no lugar do fim do id
+function numeroFor(d: FormData, id?: string) {
+  const base =
+    id ??
+    Array.from(d.email + d.nome)
+      .reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7)
+      .toString(36);
+  return memberNumber(d.obra, base, currentYear);
 }
 
 const slide: Variants = {
@@ -217,7 +215,7 @@ export default function CadastroMembro() {
       if (!res.ok) throw new Error(body?.message || "Não foi possível concluir o cadastro.");
 
       const id: string | undefined = body?.member?._id ?? body?._id;
-      setDone({ numero: memberNumber(data, id), data });
+      setDone({ numero: numeroFor(data, id), data });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       setSubmitError(

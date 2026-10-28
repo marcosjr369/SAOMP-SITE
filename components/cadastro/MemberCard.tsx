@@ -69,6 +69,10 @@ export function themeFor(obra: string): CardTheme {
   return themes.vazio;
 }
 
+export function memberNumber(obra: string, id: string, ano: number | string) {
+  return `${themeFor(obra).sigla}-${ano}-${id.slice(-5).toUpperCase()}`;
+}
+
 export type MemberCardData = {
   nome: string;
   obra: string;
@@ -93,7 +97,6 @@ export function MemberCard({
 }) {
   const t = themeFor(data.obra);
 
-  // Inclinação 3D a seguir o rato
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [10, -10]), {

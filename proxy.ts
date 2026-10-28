@@ -1,8 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-
-// Modo de manutenção: ativar com MAINTENANCE_MODE=1 nas variáveis de ambiente da Vercel.
-// Acesso secreto: abrir o site com ?acesso=<MAINTENANCE_BYPASS_KEY> guarda um cookie
-// que permite ver o site normalmente nesse navegador.
 const BYPASS_COOKIE = "saomp_acesso";
 
 const maintenanceHtml = `<!doctype html>
@@ -72,6 +68,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Deixa passar ficheiros estáticos (imagens, CSS, JS) para a página de manutenção carregar o logo.
   matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.[a-zA-Z0-9]+$).*)"],
 };
