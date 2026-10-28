@@ -2,7 +2,9 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { useState, useRef } from "react";
+import Link from "next/link";
+import { Building2, FileText, UserPlus } from "lucide-react";
+import { Suspense, useState, useRef } from "react";
 import {
   FaPray,
   FaBook,
@@ -15,37 +17,10 @@ import {
   FaDownload,
   FaMusic,
 } from "react-icons/fa";
-
-const obras = [
-  {
-    title: "Famílias Missinárias (FM)",
-    first: "Pontifícia Obra da Propagação da Fé",
-    description:
-      "Nasce do pedido de cooperação por parte do Instituto das Missões Estrangeiras de Paris, que já tinha as suas missões no Oriente e que desde o princípio, teve a seguinte característica: a universalidade. A fundadora teve como legenda 'todos os fiéis para todos os infiéis', exortava todos os fiéis a assumirem compromisso improrrogável: a Igreja é e deve ser missionária. A jovem Paulina Maria Jaricot formou em 1818 uma associação com um grupo de jovens operários, no intuito de colaborarem com os missionários em terras de missão, resultando assim na fundação da Obra da Propagação da Fé, a 03 de Maio de 1822, em Lyon (França).",
-    image: "/liga.jpeg",
-  },
-  {
-    title: "Infância e Adolescência Missionária (IAM)",
-    first: "Pontifícia Obra da Santa Infância Missionária",
-    description:
-      "Dom Carlos Augusto Maria de Forbin-Janson, depois de uma viagem missionária, primeiro à Índia, e em seguida aos EUA e ao Canadá, tomou a peito a luta contra a morte de crianças, praticado sistematicamente em alguns países. As notícias vindas dos missionários do Oriente, de modo especial da China, sobre a dura realidade das crianças (mortalidade, abandono…) sensibilizou o coração de Dom Carlos Forbin-Janson, bispo de Nancy e de Toul, Primaz de Lorena (França), despertando-lhe o desejo de aliviar o sofrimento e salvar a vida de tantos inocentes.",
-    image: "/iam.jpeg",
-  },
-  {
-    title: "Liga Missionária Juvenil (LMJ)",
-    first: "Pontifícia Obra de São Pedro Apóstolo",
-    description:
-      "Apoia a formação do clero local, seminaristas e vocações sacerdotais nas terras de missão, garantindo a continuidade pastoral das jovens Igrejas.",
-    image: "/mundo.jpeg",
-  },
-  {
-    title: "Vocacionados, Religiosos e Religiosas",
-    first: "Pontifícia Obra da União Missionária",
-    description:
-      "O Bem-Aventurado Pe. Paulo Manna (PIME), percebendo a pouca consciência missionária por parte do clero, fundou a União Missionária, a fim de despertar os Padres para missão além-fronteiras, a partir da vocação missionária de cada baptizado. A Obra foi fundada no dia 31 de Outubro de 1916 e aprovada pelo Papa Bento XV.",
-    image: "/terra.jpeg",
-  },
-];
+import { PageHero } from "@/components/ui/page-hero";
+import { Reveal } from "@/components/ui/reveal";
+import { SectionHeading } from "@/components/ui/section-heading";
+import ObrasExplorer from "@/components/obras-explorer/ObrasExplorer";
 
 const padroeiros = [
   {
@@ -288,7 +263,7 @@ export default function SobrePage() {
   };
 
   return (
-    <section className="bg-gray-50 flex flex-col justify-center items-center">
+    <section className="bg-[#fbfbf8] flex flex-col items-center">
       <audio
         ref={audioRef}
         onEnded={() => {
@@ -300,600 +275,543 @@ export default function SobrePage() {
         src={
           currentAudio !== null && oracoes[currentAudio]?.audioSrc
             ? oracoes[currentAudio].audioSrc
-            : ""
+            : undefined
         }
       />
 
-      <div className="relative h-[50vh] w-full flex flex-col justify-center items-center">
-        <Image
-          src="/movimento12.jpeg"
-          alt="Obras Missionárias Pontifícias"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/65 flex items-center">
-          <div className="max-w-5xl mx-auto px-6 text-center">
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-4xl md:text-5xl font-bold text-white mb-4"
-            >
-              Obras Missionárias Pontifícias
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-gray-200 text-lg md:text-xl max-w-3xl mx-auto"
-            >
-              No coração da Igreja, a serviço da missão universal de anunciar
-              Cristo a todos os povos.
-            </motion.p>
+      <PageHero
+        image="/movimento12.jpeg"
+        eyebrow="Sobre o Movimento"
+        title="Obras Missionárias Pontifícias"
+        description="No coração da Igreja, a serviço da missão universal de anunciar Cristo a todos os povos."
+      />
+
+      <div className="w-full bg-white">
+        <div className="max-w-7xl mx-auto px-5 py-20 md:py-28 grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
+          <div>
+            <SectionHeading
+              align="left"
+              eyebrow="Quem somos"
+              title="Identidade Missionária"
+            />
+            <Reveal delay={0.1}>
+              <p className="mt-6 text-gray-600 text-lg leading-relaxed">
+                As Obras Missionárias Pontifícias são o instrumento oficial da
+                Igreja Católica para despertar, animar e sustentar a cooperação
+                missionária universal, colocando todas as Igrejas locais em
+                comunhão com a missão evangelizadora confiada por Cristo.
+              </p>
+              <blockquote className="mt-8 border-l-4 border-yellow-500 pl-5 font-display text-xl md:text-2xl italic leading-snug text-gray-950">
+                “Promover o espírito missionário universal em todo o povo de
+                Deus.”
+              </blockquote>
+            </Reveal>
           </div>
-        </div>
-      </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-16 flex flex-col justify-center items-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="mb-16 text-center"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Identidade Missionária
-          </h2>
-          <p className="text-gray-600 text-lg leading-relaxed">
-            As Obras Missionárias Pontifícias são o instrumento oficial da
-            Igreja Católica para despertar, animar e sustentar a cooperação
-            missionária universal, colocando todas as Igrejas locais em comunhão
-            com a missão evangelizadora confiada por Cristo. As OMP têm como
-            finalidade{" "}
-            <span className="font-semibold text-yellow-600">
-              "Promover o espírito missionário universal em todo o povo de
-              Deus".
-            </span>
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="mb-16"
-        >
-          <h3 className="text-2xl font-semibold mb-3 text-center">
-            Origem e Reconhecimento
-          </h3>
-          <p className="text-gray-600 text-lg leading-relaxed text-center">
-            Surgidas no século XIX a partir da fé viva de leigos comprometidos,
-            especialmente com Pauline Jaricot, as Obras Missionárias foram
-            reconhecidas como Pontifícias em 1922 pelo Papa Pio XI, tornando-se
-            expressão direta da solicitude missionária do Santo Padre.
-          </p>
-        </motion.div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-6 py-16 w-full">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">
-            Padroeiros das Missões
-          </h2>
-          <p className="text-gray-600 text-lg">
-            Conheça os santos padroeiros que inspiram o trabalho missionário
-          </p>
-        </div>
-
-        <div className="space-y-6 mb-16">
-          {padroeiros.map((padroeiro, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-xl shadow-md overflow-hidden"
-            >
-              <button
-                onClick={() =>
-                  setOpenPadroeiro(openPadroeiro === index ? null : index)
-                }
-                className="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="text-left">
-                    <h3 className="text-xl font-bold">{padroeiro.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Clique para{" "}
-                      {openPadroeiro === index ? "fechar" : "expandir"}{" "}
-                      informações
+          <Reveal delay={0.15} className="relative">
+            <div className="absolute -inset-3 -z-0 rotate-2 rounded-[2rem] bg-yellow-500" />
+            <div className="relative rounded-[2rem] bg-gray-950 p-8 md:p-10 text-white">
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-yellow-500 text-gray-950">
+                <FaHistory className="h-5 w-5" />
+              </span>
+              <h3 className="mt-6 text-2xl font-semibold">
+                Origem e Reconhecimento
+              </h3>
+              <p className="mt-3 text-white/70 leading-relaxed">
+                Surgidas no século XIX a partir da fé viva de leigos
+                comprometidos, especialmente com Pauline Jaricot, as Obras
+                Missionárias foram reconhecidas como Pontifícias em 1922 pelo
+                Papa Pio XI, tornando-se expressão direta da solicitude
+                missionária do Santo Padre.
+              </p>
+              <div className="mt-8 grid grid-cols-3 gap-4 border-t border-white/10 pt-6">
+                {[
+                  { value: "1822", label: "Fundação" },
+                  { value: "1922", label: "Pontifícias" },
+                  { value: "4", label: "Obras" },
+                ].map((stat) => (
+                  <div key={stat.label}>
+                    <p className="font-display text-3xl font-semibold text-yellow-500">
+                      {stat.value}
+                    </p>
+                    <p className="text-xs uppercase tracking-wider text-white/50">
+                      {stat.label}
                     </p>
                   </div>
-                </div>
-                <div className="p-2">
-                  <motion.div
-                    animate={{ rotate: openPadroeiro === index ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <FaChevronDown className="w-5 h-5 text-gray-500" />
-                  </motion.div>
-                </div>
-              </button>
-
-              <AnimatePresence>
-                {openPadroeiro === index && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="px-6 pb-6 pt-2 border-t">
-                      <div className="flex flex-col lg:flex-row gap-6">
-                        <div className="lg:w-2/5">
-                          <div className="relative h-64 lg:h-auto lg:min-h-100 w-full rounded-lg overflow-hidden shadow-lg">
-                            <Image
-                              src={padroeiro.image}
-                              alt={padroeiro.name}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 1024px) 100vw, 40vw"
-                            />
-                          </div>
-                          <div className="mt-4 text-center space-y-2">
-                            <span className="inline-block px-4 py-2 text-sm font-semibold bg-yellow-500 text-white rounded-full">
-                              Padroeiro das Missões
-                            </span>
-                            <div className="flex flex-col items-center mt-3 text-gray-600">
-                              <div className="flex items-center gap-2">
-                                <FaHistory className="w-4 h-4" />
-                                <span className="font-medium">
-                                  Festa Litúrgica:
-                                </span>
-                              </div>
-                              <span className="mt-1">
-                                {padroeiro.name.includes("Francisco")
-                                  ? "03 de Dezembro"
-                                  : "01 de Outubro"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="lg:w-3/5">
-                          <div className="prose prose-lg max-w-none">
-                            <p className="text-gray-700 leading-relaxed whitespace-pre-line mb-4">
-                              {showFullDescription[`padroeiro-${index}`]
-                                ? padroeiro.fullDescription
-                                : padroeiro.description}
-                            </p>
-
-                            {padroeiro.fullDescription.length >
-                              padroeiro.description.length && (
-                              <button
-                                onClick={() =>
-                                  toggleFullDescription(index, "padroeiro")
-                                }
-                                className="flex items-center gap-2 text-yellow-600 hover:text-yellow-700 font-medium transition-colors mb-4"
-                              >
-                                {showFullDescription[`padroeiro-${index}`] ? (
-                                  <>
-                                    <FaChevronUp className="w-4 h-4" />
-                                    Ver menos
-                                  </>
-                                ) : (
-                                  <>
-                                    <FaChevronDown className="w-4 h-4" />
-                                    Ler história completa
-                                  </>
-                                )}
-                              </button>
-                            )}
-
-                            <div className="mt-6 pt-6 border-t border-gray-100 space-y-3">
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <span className="font-medium">
-                                  Proclamado Padroeiro:
-                                </span>
-                                <span>
-                                  14 de Dezembro de 1928 pelo Papa Pio XI
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <span className="font-medium">Título:</span>
-                                <span>
-                                  {padroeiro.name.includes("Francisco")
-                                    ? "Apóstolo do Oriente"
-                                    : "Doutora da Igreja"}
-                                </span>
-                              </div>
-                              {padroeiro.name.includes("Teresinha") && (
-                                <div className="text-gray-600">
-                                  <span className="font-medium">
-                                    Também conhecida como:
-                                  </span>
-                                  <span className="ml-2">
-                                    Santa das Rosas, Pequena Flor
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                ))}
+              </div>
             </div>
-          ))}
+          </Reveal>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-16 w-full">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">
-            Fundadores das Obras Missionárias
-          </h2>
-          <p className="text-gray-600 text-lg">
-            Conheça as pessoas inspiradas por Deus para fundar as Obras
-            Missionárias Pontifícias
-          </p>
-        </div>
+      <div id="obras" className="w-full scroll-mt-20 py-20 md:py-28">
+        <div className="max-w-7xl mx-auto px-5">
+          <SectionHeading
+            eyebrow="Unidas num só espírito"
+            title="As Quatro Obras Missionárias"
+            description="Unidas num único espírito missionário, as OMP atuam de forma complementar, garantindo formação, animação, espiritualidade e partilha solidária."
+          />
 
-        <div className="space-y-6 mb-16">
-          {fundadores.map((fundador, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-xl shadow-md overflow-hidden"
-            >
-              <button
-                onClick={() =>
-                  setOpenFundador(openFundador === index ? null : index)
-                }
-                className="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="text-left">
-                    <h3 className="text-xl font-bold">{fundador.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-gray-500">
-                        Clique para{" "}
-                        {openFundador === index ? "fechar" : "expandir"}{" "}
-                        informações
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-2">
-                  <motion.div
-                    animate={{ rotate: openFundador === index ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <FaChevronDown className="w-5 h-5 text-gray-500" />
-                  </motion.div>
-                </div>
-              </button>
-
-              <AnimatePresence>
-                {openFundador === index && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="px-6 pb-6 pt-2 border-t">
-                      <div className="flex flex-col">
-                        <div className="mb-6">
-                          <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 rounded-full mb-4">
-                            <FaUserFriends className="w-4 h-4 text-yellow-600" />
-                            <span className="font-semibold text-yellow-700">
-                              {fundador.obra}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="prose prose-lg max-w-none">
-                          <p className="text-gray-700 leading-relaxed whitespace-pre-line mb-4">
-                            {showFullDescription[`fundador-${index}`]
-                              ? fundador.fullDescription
-                              : fundador.description}
-                          </p>
-
-                          {fundador.fullDescription.length >
-                            fundador.description.length && (
-                            <button
-                              onClick={() =>
-                                toggleFullDescription(index, "fundador")
-                              }
-                              className="flex items-center gap-2 text-yellow-600 hover:text-yellow-700 font-medium transition-colors mb-6"
-                            >
-                              {showFullDescription[`fundador-${index}`] ? (
-                                <>
-                                  <FaChevronUp className="w-4 h-4" />
-                                  Ver menos
-                                </>
-                              ) : (
-                                <>
-                                  <FaChevronDown className="w-4 h-4" />
-                                  Ler história completa
-                                </>
-                              )}
-                            </button>
-                          )}
-
-                          <div className="mt-6 pt-6 border-t border-gray-100 space-y-3">
-                            <div className="flex items-center gap-2 text-gray-600">
-                              <span className="font-medium">Status:</span>
-                              <span>
-                                {fundador.name.includes("Paulo Manna")
-                                  ? "Beato"
-                                  : fundador.name.includes("Paulina")
-                                    ? "Venerável"
-                                    : "Servo(a) de Deus"}
-                              </span>
-                            </div>
-                            {fundador.name.includes("Paulo Manna") && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <span className="font-medium">
-                                  Beatificação:
-                                </span>
-                                <span>
-                                  04 de Novembro de 2001 pelo Papa João Paulo II
-                                </span>
-                              </div>
-                            )}
-                            {fundador.name.includes("Paulina") && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <span className="font-medium">
-                                  Declarada Venerável:
-                                </span>
-                                <span>
-                                  25 de Fevereiro de 1963 pelo Papa João XXIII
-                                </span>
-                              </div>
-                            )}
-                            <div className="text-gray-600">
-                              <span className="font-medium">Contribuição:</span>
-                              <span className="ml-2">
-                                Fundação de uma das quatro Obras Missionárias
-                                Pontifícias
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            As Quatro Obras Missionárias
-          </h2>
-          <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-            Unidas num único espírito missionário, as OMP atuam de forma
-            complementar, garantindo formação, animação, espiritualidade e
-            partilha solidária.
-          </p>
-        </motion.div>
-
-        <div className="grid gap-8 md:grid-cols-2">
-          {obras.map((obra, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.15 }}
-              className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
-            >
-              <div className="relative h-72">
-                <Image
-                  src={obra.image}
-                  alt={obra.title}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent" />
-              </div>
-              <div className="p-6">
-                <span className="inline-block mb-3 px-3 py-1 text-xs font-semibold bg-yellow-500 text-white rounded-full">
-                  {obra.first}
-                </span>
-                <h3 className="text-xl font-bold mb-3">{obra.title}</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {obra.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-white py-20 w-full">
-        <div className="max-w-5xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Orações Missionárias
-            </h2>
-            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-              Orai sem cessar pelos missionários e pela evangelização dos povos
-            </p>
-          </motion.div>
-
-          <div className="space-y-6">
-            {oracoes.map((oracao, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl shadow-md overflow-hidden"
-              >
-                <button
-                  onClick={() =>
-                    setOpenOracao(openOracao === index ? null : index)
-                  }
-                  className="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors group"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-200 transition-colors">
-                      <oracao.icon className="w-6 h-6 text-green-600" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="text-xl font-bold">{oracao.title}</h3>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Clique para{" "}
-                        {openOracao === index ? "fechar" : "expandir"} oração
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-2">
-                    <motion.div
-                      animate={{ rotate: openOracao === index ? 180 : 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <FaChevronDown className="w-5 h-5 text-gray-500" />
-                    </motion.div>
-                  </div>
-                </button>
-
-                <AnimatePresence>
-                  {openOracao === index && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-6 pb-6 pt-2 border-t">
-                        <div className="bg-green-50 p-4 rounded-lg mb-6">
-                          <p className="text-gray-700 italic text-center font-medium">
-                            "Rezai sem cessar" - 1 Tessalonicenses 5:17
-                          </p>
-                        </div>
-                        <div className="prose prose-lg max-w-none">
-                          <p className="text-gray-700 leading-relaxed whitespace-pre-line mb-6">
-                            {oracao.description}
-                          </p>
-                        </div>
-                        {oracao.audioSrc && (
-                          <div className="mt-6 pt-6 border-t border-gray-100">
-                            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
-                              <div className="flex items-center gap-3">
-                                <div className="p-3 bg-green-100 rounded-full">
-                                  <FaMusic className="w-5 h-5 text-green-600" />
-                                </div>
-                                <div>
-                                  <h4 className="font-semibold text-gray-800">
-                                    Ouça esta oração/canto
-                                  </h4>
-                                  <p className="text-sm text-gray-500">
-                                    {oracao.title} - Música missionária
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-3">
-                                <button
-                                  onClick={() => handleAudioToggle(index)}
-                                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                                >
-                                  {currentAudio === index && isPlaying ? (
-                                    <>
-                                      <FaPause className="w-4 h-4" />
-                                      Pausar
-                                    </>
-                                  ) : (
-                                    <>
-                                      <FaPlay className="w-4 h-4" />
-                                      Ouvir
-                                    </>
-                                  )}
-                                </button>
-
-                                <button
-                                  onClick={() =>
-                                    handleDownload(
-                                      oracao.audioSrc,
-                                      oracao.downloadName || oracao.title,
-                                    )
-                                  }
-                                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                >
-                                  <FaDownload className="w-4 h-4" />
-                                  Baixar
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-                              <p className="font-medium mb-1">Informação:</p>
-                              <p>
-                                Esta música pode ser usada em encontros
-                                missionários, celebrações e momentos de oração.
-                              </p>
-                            </div>
-                          </div>
-                        )}
-
-                        {!oracao.audioSrc && (
-                          <div className="mt-6 pt-6 border-t border-gray-100">
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                              <oracao.icon className="w-4 h-4" />
-                              <span className="font-medium">
-                                Oração recomendada para todos os missionários
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
+          <div className="mt-14">
+            <Suspense fallback={null}>
+              <ObrasExplorer />
+            </Suspense>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="mt-20 text-center"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Estrutura e Organização
-            </h2>
-            <p className="text-gray-600 text-lg leading-relaxed max-w-4xl mx-auto">
-              As Obras Missionárias Pontifícias atuam em nível universal,
-              nacional e diocesano. Na Arquidiocese de Luanda, o Secretariado
-              Arquidiocesano coordena a animação missionária, promove a formação
-              pastoral e fortalece a comunhão entre vigararias, paróquias,
-              movimentos e comunidades.
-            </p>
-          </motion.div>
         </div>
+      </div>
+
+      <div className="w-full bg-white py-20 md:py-28">
+        <div className="max-w-5xl mx-auto px-5">
+          <SectionHeading
+            eyebrow="Inspiração"
+            title="Padroeiros das Missões"
+            description="Conheça os santos padroeiros que inspiram o trabalho missionário."
+          />
+
+          <div className="mt-12 space-y-4">
+            {padroeiros.map((padroeiro, index) => {
+              const isOpen = openPadroeiro === index;
+              return (
+                <AccordionItem
+                  key={index}
+                  isOpen={isOpen}
+                  onToggle={() => setOpenPadroeiro(isOpen ? null : index)}
+                  leading={
+                    <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl ring-2 ring-yellow-500">
+                      <Image
+                        src={padroeiro.image}
+                        alt=""
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
+                    </span>
+                  }
+                  title={padroeiro.name}
+                  subtitle={
+                    padroeiro.name.includes("Francisco")
+                      ? "Apóstolo do Oriente · Festa a 03 de Dezembro"
+                      : "Doutora da Igreja · Festa a 01 de Outubro"
+                  }
+                >
+                  <div className="flex flex-col lg:flex-row gap-8">
+                    <div className="lg:w-2/5">
+                      <div className="relative h-72 lg:h-full lg:min-h-96 w-full overflow-hidden rounded-2xl">
+                        <Image
+                          src={padroeiro.image}
+                          alt={padroeiro.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 40vw"
+                        />
+                        <span className="absolute left-4 top-4 rounded-full bg-yellow-500 px-3 py-1 text-xs font-semibold">
+                          Padroeiro das Missões
+                        </span>
+                      </div>
+                    </div>
+                    <div className="lg:w-3/5">
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                        {showFullDescription[`padroeiro-${index}`]
+                          ? padroeiro.fullDescription
+                          : padroeiro.description}
+                      </p>
+
+                      {padroeiro.fullDescription.length >
+                        padroeiro.description.length && (
+                        <ReadMore
+                          open={!!showFullDescription[`padroeiro-${index}`]}
+                          onClick={() =>
+                            toggleFullDescription(index, "padroeiro")
+                          }
+                        />
+                      )}
+
+                      <dl className="mt-6 grid gap-3 sm:grid-cols-2">
+                        <Fact
+                          label="Festa Litúrgica"
+                          value={
+                            padroeiro.name.includes("Francisco")
+                              ? "03 de Dezembro"
+                              : "01 de Outubro"
+                          }
+                        />
+                        <Fact
+                          label="Título"
+                          value={
+                            padroeiro.name.includes("Francisco")
+                              ? "Apóstolo do Oriente"
+                              : "Doutora da Igreja"
+                          }
+                        />
+                        <Fact
+                          label="Proclamado Padroeiro"
+                          value="14 de Dezembro de 1928 pelo Papa Pio XI"
+                        />
+                        {padroeiro.name.includes("Teresinha") && (
+                          <Fact
+                            label="Também conhecida como"
+                            value="Santa das Rosas, Pequena Flor"
+                          />
+                        )}
+                      </dl>
+                    </div>
+                  </div>
+                </AccordionItem>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full py-20 md:py-28">
+        <div className="max-w-5xl mx-auto px-5">
+          <SectionHeading
+            eyebrow="História"
+            title="Fundadores das Obras Missionárias"
+            description="Conheça as pessoas inspiradas por Deus para fundar as Obras Missionárias Pontifícias."
+          />
+
+          <div className="mt-12 space-y-4">
+            {fundadores.map((fundador, index) => {
+              const isOpen = openFundador === index;
+              return (
+                <AccordionItem
+                  key={index}
+                  isOpen={isOpen}
+                  onToggle={() => setOpenFundador(isOpen ? null : index)}
+                  leading={
+                    <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gray-950 font-display text-xl font-semibold text-yellow-500">
+                      {fundador.name
+                        .split(" ")
+                        .filter((p) => p.length > 2)
+                        .slice(0, 2)
+                        .map((p) => p[0])
+                        .join("")}
+                    </span>
+                  }
+                  title={fundador.name}
+                  subtitle={fundador.obra}
+                >
+                  <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-yellow-500/20 px-4 py-2 ring-1 ring-yellow-500/50">
+                    <FaUserFriends className="w-4 h-4 text-gray-900" />
+                    <span className="text-sm font-semibold text-gray-900">
+                      {fundador.obra}
+                    </span>
+                  </div>
+
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    {showFullDescription[`fundador-${index}`]
+                      ? fundador.fullDescription
+                      : fundador.description}
+                  </p>
+
+                  {fundador.fullDescription.length >
+                    fundador.description.length && (
+                    <ReadMore
+                      open={!!showFullDescription[`fundador-${index}`]}
+                      onClick={() => toggleFullDescription(index, "fundador")}
+                    />
+                  )}
+
+                  <dl className="mt-6 grid gap-3 sm:grid-cols-2">
+                    <Fact
+                      label="Status"
+                      value={
+                        fundador.name.includes("Paulo Manna")
+                          ? "Beato"
+                          : fundador.name.includes("Paulina")
+                            ? "Venerável"
+                            : "Servo(a) de Deus"
+                      }
+                    />
+                    {fundador.name.includes("Paulo Manna") && (
+                      <Fact
+                        label="Beatificação"
+                        value="04 de Novembro de 2001 pelo Papa João Paulo II"
+                      />
+                    )}
+                    {fundador.name.includes("Paulina") && (
+                      <Fact
+                        label="Declarada Venerável"
+                        value="25 de Fevereiro de 1963 pelo Papa João XXIII"
+                      />
+                    )}
+                    <Fact
+                      label="Contribuição"
+                      value="Fundação de uma das quatro Obras Missionárias Pontifícias"
+                    />
+                  </dl>
+                </AccordionItem>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full bg-white py-20 md:py-28">
+        <div className="max-w-5xl mx-auto px-5">
+          <SectionHeading
+            eyebrow="Rezai sem cessar"
+            title="Orações e Hinos Missionários"
+            description="Orai sem cessar pelos missionários e pela evangelização dos povos."
+          />
+
+          <div className="mt-12 space-y-4">
+            {oracoes.map((oracao, index) => {
+              const isOpen = openOracao === index;
+              const playingThis = currentAudio === index && isPlaying;
+              return (
+                <AccordionItem
+                  key={index}
+                  isOpen={isOpen}
+                  onToggle={() => setOpenOracao(isOpen ? null : index)}
+                  leading={
+                    <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-yellow-500/20 ring-1 ring-yellow-500/50">
+                      <oracao.icon className="w-5 h-5 text-gray-900" />
+                    </span>
+                  }
+                  title={oracao.title}
+                  subtitle={oracao.audioSrc ? "Letra e áudio" : "Oração"}
+                  trailing={
+                    playingThis ? (
+                      <span className="flex items-end gap-0.5 h-4" aria-label="A tocar">
+                        {[0, 1, 2].map((b) => (
+                          <motion.span
+                            key={b}
+                            className="w-1 rounded-full bg-gray-950"
+                            animate={{ height: ["30%", "100%", "30%"] }}
+                            transition={{ duration: 0.9, repeat: Infinity, delay: b * 0.15 }}
+                          />
+                        ))}
+                      </span>
+                    ) : null
+                  }
+                >
+                  <div className="grid gap-6 md:grid-cols-[1fr_auto]">
+                    <p className="font-display text-lg leading-relaxed text-gray-800 whitespace-pre-line">
+                      {oracao.description}
+                    </p>
+
+                    {oracao.audioSrc && (
+                      <div className="md:w-64 h-fit rounded-2xl bg-gray-950 p-5 text-white md:sticky md:top-28">
+                        <div className="flex items-center gap-3">
+                          <span className="grid h-10 w-10 place-items-center rounded-full bg-yellow-500 text-gray-950">
+                            <FaMusic className="w-4 h-4" />
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold">
+                              {oracao.title}
+                            </p>
+                            <p className="text-xs text-white/50">
+                              Música missionária
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-5 grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => handleAudioToggle(index)}
+                            className="flex items-center justify-center gap-2 rounded-full bg-yellow-500 px-4 py-2.5 text-sm font-semibold text-gray-950 transition-colors hover:bg-yellow-400"
+                          >
+                            {playingThis ? (
+                              <>
+                                <FaPause className="w-3.5 h-3.5" />
+                                Pausar
+                              </>
+                            ) : (
+                              <>
+                                <FaPlay className="w-3.5 h-3.5" />
+                                Ouvir
+                              </>
+                            )}
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleDownload(
+                                oracao.audioSrc,
+                                oracao.downloadName || oracao.title,
+                              )
+                            }
+                            className="flex items-center justify-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-gray-950 transition-transform hover:-translate-y-0.5"
+                          >
+                            <FaDownload className="w-3.5 h-3.5" />
+                            Baixar
+                          </button>
+                        </div>
+                        <p className="mt-4 text-xs leading-relaxed text-white/50">
+                          Pode ser usada em encontros missionários,
+                          celebrações e momentos de oração.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {!oracao.audioSrc && (
+                    <p className="mt-6 border-t border-gray-100 pt-4 text-sm italic text-gray-500">
+                      “Rezai sem cessar” — 1 Tessalonicenses 5:17
+                    </p>
+                  )}
+                </AccordionItem>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full px-5 py-20 md:py-24">
+        <Reveal className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-yellow-500 px-6 py-14 md:px-16 md:py-20">
+          <div className="bg-dots absolute inset-0 opacity-60 [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
+          <motion.div
+            aria-hidden
+            className="absolute -right-24 -bottom-24 h-80 w-80 rounded-full border-[40px] border-white/40"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          />
+
+          <div className="relative grid items-center gap-10 md:grid-cols-[1.4fr_1fr]">
+            <div>
+              <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-gray-950/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]">
+                <Building2 className="h-3.5 w-3.5" />
+                Na Arquidiocese de Luanda
+              </span>
+              <h2 className="font-display text-3xl md:text-5xl font-semibold leading-tight tracking-tight">
+                Estrutura e Organização
+              </h2>
+              <p className="mt-4 max-w-xl text-base md:text-lg leading-relaxed text-gray-950/75">
+                As Obras Missionárias Pontifícias atuam em nível universal,
+                nacional e diocesano. Na Arquidiocese de Luanda, o Secretariado
+                Arquidiocesano coordena a animação missionária, promove a
+                formação pastoral e fortalece a comunhão entre vigararias,
+                paróquias, movimentos e comunidades.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row md:flex-col md:items-stretch md:justify-self-end">
+              <Link
+                href="/cadastro"
+                className="group inline-flex h-14 items-center gap-4 rounded-full bg-gray-950 pl-2 pr-7 font-semibold text-white shadow-[0_8px_24px_-12px_rgb(0_0_0/0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-900"
+              >
+                <span className="grid h-10 w-10 place-items-center rounded-full bg-yellow-500 text-gray-950 transition-transform duration-300 group-hover:scale-110">
+                  <UserPlus className="h-[18px] w-[18px]" />
+                </span>
+                Juntar-se à Missão
+              </Link>
+              <Link
+                href="/documentos"
+                className="group inline-flex h-14 items-center gap-4 rounded-full bg-white pl-2 pr-7 font-semibold text-gray-950 shadow-[0_8px_24px_-12px_rgb(0_0_0/0.35)] transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <span className="grid h-10 w-10 place-items-center rounded-full bg-yellow-500 transition-transform duration-300 group-hover:scale-110">
+                  <FileText className="h-[18px] w-[18px]" />
+                </span>
+                Ver Documentos
+              </Link>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
+  );
+}
+
+function AccordionItem({
+  isOpen,
+  onToggle,
+  leading,
+  title,
+  subtitle,
+  trailing,
+  children,
+}: {
+  isOpen: boolean;
+  onToggle: () => void;
+  leading: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  trailing?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <Reveal
+      y={16}
+      className={`overflow-hidden rounded-3xl border bg-white transition-colors duration-300 ${
+        isOpen
+          ? "border-yellow-500 shadow-[0_20px_50px_-30px_rgb(0_0_0/0.35)]"
+          : "border-gray-200/80 hover:border-gray-300"
+      }`}
+    >
+      <button
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="flex w-full items-center gap-4 p-4 md:p-5 text-left"
+      >
+        {leading}
+        <div className="min-w-0 flex-1">
+          <h3 className="text-lg md:text-xl font-semibold text-gray-950">
+            {title}
+          </h3>
+          {subtitle && (
+            <p className="mt-0.5 truncate text-sm text-gray-500">{subtitle}</p>
+          )}
+        </div>
+        {trailing}
+        <motion.span
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3 }}
+          className={`grid h-10 w-10 shrink-0 place-items-center rounded-full transition-colors ${
+            isOpen ? "bg-yellow-500 text-gray-950" : "bg-gray-100 text-gray-600"
+          }`}
+        >
+          <FaChevronDown className="w-3.5 h-3.5" />
+        </motion.span>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="border-t border-gray-100 px-5 pb-6 pt-6 md:px-8 md:pb-8">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Reveal>
+  );
+}
+
+function ReadMore({ open, onClick }: { open: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="mt-4 inline-flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-900 transition-colors hover:bg-yellow-500"
+    >
+      {open ? (
+        <>
+          <FaChevronUp className="w-3 h-3" />
+          Ver menos
+        </>
+      ) : (
+        <>
+          <FaChevronDown className="w-3 h-3" />
+          Ler história completa
+        </>
+      )}
+    </button>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-gray-50 p-4">
+      <dt className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        {label}
+      </dt>
+      <dd className="mt-1 text-sm font-medium text-gray-800">{value}</dd>
+    </div>
   );
 }

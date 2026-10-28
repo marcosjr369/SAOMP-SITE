@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
@@ -14,9 +14,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "SAOMP - Secretariado Arquidiocesano das Obras Missionárias Pontifícias",
-  description: "GSite oficial da SAOMP - Secretariado Arquidiocesano das Obras Missionárias Pontifícias",
+  title:
+    "SAOMP - Secretariado Arquidiocesano das Obras Missionárias Pontifícias",
+  description:
+    "Site oficial da SAOMP - Secretariado Arquidiocesano das Obras Missionárias Pontifícias",
 };
 
 export default function RootLayout({
@@ -27,10 +34,10 @@ export default function RootLayout({
   return (
     <html lang="pt">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} antialiased`}
       >
         <Header />
-        {children}
+        <main className="site-content">{children}</main>
         <Footer />
       </body>
     </html>

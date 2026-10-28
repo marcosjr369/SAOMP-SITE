@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, X, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Portal } from "@/components/ui/portal";
+import { ArrowRight, Download, X, Eye, FileText, Search } from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 const documents = [
   {
@@ -79,119 +80,188 @@ const documents = [
   },
   {
     title: "As Quatro Áreas Integradas Metodologias da Infância Missionária",
-    description: "As Quatro Áreas Integradas Metodologias da Infância Missionária",
+    description:
+      "As Quatro Áreas Integradas Metodologias da Infância Missionária",
     pdf: "/documentos/As Quatro Áreas Integradas Metodologias da Infância Missionária.pdf",
     logoText: "Áreas Integradas Metodologias da Infância Missionária",
-  }
+  },
 ];
 
+type Doc = (typeof documents)[number];
+
 export default function DocumentsPage() {
-  const [activeDoc, setActiveDoc] = useState<any>(null);
+  const [activeDoc, setActiveDoc] = useState<Doc | null>(null);
+  const [query, setQuery] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return documents;
+    return documents.filter(
+      (d) =>
+        d.title.toLowerCase().includes(q) ||
+        d.description.toLowerCase().includes(q),
+    );
+  }, [query]);
+
+  useEffect(() => {
+    if (!activeDoc) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActiveDoc(null);
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [activeDoc]);
 
   return (
-    <section className="bg-gray-50">
-      <div
-        className="relative h-100 md:h-125 flex items-center justify-center text-center bg-cover bg-center"
-        style={{
-          backgroundImage: `url('movimento11.jpeg')`,
-        }}
-      >
-        <div className="absolute inset-0 bg-black/40"></div>
-        <motion.div
-          className="relative z-10 text-white px-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Documentos Oficiais da SAOMP
-          </h1>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto">
-            Acesse planos trienais, regulamentos e programas oficiais com
-            facilidade.
-          </p>
-        </motion.div>
-      </div>
+    <section className="bg-[#fbfbf8] min-h-screen">
+      <PageHero
+        image="/movimento20.jpeg"
+        imagePosition="center 35%"
+        eyebrow="Biblioteca"
+        title="Documentos Oficiais da SAOMP"
+        description="Aceda a planos trienais, regulamentos, rituais e programas oficiais com facilidade."
+      />
 
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {documents.map((doc, idx) => (
-            <motion.div
-              key={idx}
-              className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition cursor-pointer flex flex-col group"
+      <div className="max-w-7xl mx-auto px-5 py-14 md:py-20">
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <p className="text-sm text-gray-500">
+            <span className="font-semibold text-gray-950">
+              {filtered.length}
+            </span>{" "}
+            {filtered.length === 1
+              ? "documento disponível"
+              : "documentos disponíveis"}
+          </p>
+          <label className="relative w-full md:w-80">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Pesquisar documentos..."
+              className="h-12 w-full rounded-full border border-gray-200 bg-white pl-11 pr-4 text-sm outline-none transition-shadow focus:border-yellow-600 focus:ring-4 focus:ring-yellow-500/30"
+            />
+          </label>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((doc, idx) => (
+            <motion.button
+              key={doc.pdf}
+              type="button"
+              onClick={() => setActiveDoc(doc)}
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-6 text-left transition-all duration-300 hover:-translate-y-1 hover:border-yellow-500 hover:shadow-[0_20px_40px_-20px_rgb(0_0_0/0.25)]"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: (idx % 3) * 0.08 }}
             >
-              <div className="flex items-center justify-center h-32 bg-linear-to-r from-yellow-400 to-yellow-500 text-white text-md md:text-xl px-5 font-bold shrink-0 transition-transform group-hover:scale-105">
+              <div className="mb-6 flex items-start justify-between">
+                <span className="grid h-14 w-14 place-items-center rounded-2xl bg-yellow-500/20 ring-1 ring-yellow-500/50 transition-colors group-hover:bg-yellow-500">
+                  <FileText className="h-6 w-6 text-gray-900" />
+                </span>
+                <span className="rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                  PDF
+                </span>
+              </div>
+              <p className="mb-1.5 line-clamp-1 text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
                 {doc.logoText}
-              </div>
-              <div className="p-6 flex flex-col grow justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-yellow-600 transition">
-                    {doc.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4">{doc.description}</p>
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full flex items-center gap-2 mt-auto hover:bg-yellow-50 transition"
-                  onClick={() => setActiveDoc(doc)}
-                >
-                  <Eye size={18} />
-                  Visualizar
-                </Button>
-              </div>
-            </motion.div>
+              </p>
+              <h3 className="text-lg font-semibold leading-snug text-gray-950">
+                {doc.title}
+              </h3>
+              <p className="mb-6 mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">
+                {doc.description}
+              </p>
+              <span className="mt-auto flex items-center gap-2 border-t border-gray-100 pt-5 text-sm font-semibold text-gray-950">
+                <Eye className="h-4 w-4" />
+                Visualizar documento
+                <span className="ml-auto grid h-8 w-8 place-items-center rounded-full bg-gray-100 transition-all group-hover:bg-gray-950 group-hover:text-white">
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </span>
+            </motion.button>
           ))}
         </div>
+
+        {filtered.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-gray-300 py-16 text-center text-gray-500">
+            Nenhum documento encontrado para “{query}”.
+          </div>
+        )}
       </div>
 
-      <AnimatePresence>
-        {activeDoc && (
-          <motion.div
-            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
+      <Portal>
+        <AnimatePresence>
+          {activeDoc && (
             <motion.div
-              className="bg-white w-full max-w-3xl rounded-2xl p-6 relative overflow-y-auto max-h-[90vh] shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              className="fixed inset-0 z-60 flex items-center justify-center bg-gray-950/70 px-4 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActiveDoc(null)}
             >
-              <button
-                onClick={() => setActiveDoc(null)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+              <motion.div
+                className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+                initial={{ y: 30, opacity: 0, scale: 0.98 }}
+                animate={{ y: 0, opacity: 1, scale: 1 }}
+                exit={{ y: 30, opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                onClick={(e) => e.stopPropagation()}
               >
-                <X size={22} />
-              </button>
+                <div className="flex items-start gap-4 border-b border-gray-100 p-5 md:p-6">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-yellow-500">
+                    <FileText className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-lg md:text-xl font-semibold text-gray-950">
+                      {activeDoc.title}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {activeDoc.description}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveDoc(null)}
+                    aria-label="Fechar"
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
 
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                {activeDoc.title}
-              </h3>
-              <p className="text-gray-600 mb-6">{activeDoc.description}</p>
+                <div className="flex-1 bg-gray-100 p-3">
+                  <iframe
+                    src={activeDoc.pdf}
+                    title={activeDoc.title}
+                    className="h-[60vh] md:h-[66vh] w-full rounded-xl border border-gray-200 bg-white"
+                  />
+                </div>
 
-              <div className="w-full h-[60vh] md:h-[70vh] mb-4">
-                <iframe
-                  src={activeDoc.pdf}
-                  className="w-full h-full border rounded-md"
-                  style={{ minHeight: "400px" }}
-                ></iframe>
-              </div>
-
-              <a href={activeDoc.pdf} download>
-                <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-white flex items-center justify-center gap-2">
-                  <Download size={18} />
-                  Baixar PDF
-                </Button>
-              </a>
+                <div className="flex flex-col-reverse gap-3 p-5 sm:flex-row sm:justify-end">
+                  <button
+                    onClick={() => setActiveDoc(null)}
+                    className="rounded-full px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+                  >
+                    Fechar
+                  </button>
+                  <a
+                    href={activeDoc.pdf}
+                    download
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-yellow-500 px-6 py-3 text-sm font-semibold transition-colors hover:bg-yellow-400"
+                  >
+                    <Download size={18} />
+                    Baixar PDF
+                  </a>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </Portal>
     </section>
   );
 }

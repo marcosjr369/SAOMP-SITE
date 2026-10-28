@@ -17,6 +17,22 @@
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
   --color-chart-5: var(--chart-5);
+  --color-brand: #fef200;
+  --color-yellow-50: #fffef0;
+  --color-yellow-100: #fffcd1;
+  --color-yellow-200: #fff89e;
+  --color-yellow-300: #fff55c;
+  --color-yellow-400: #fef32e;
+  --color-yellow-500: #fef200;
+  --color-yellow-600: #e6d900;
+  --color-yellow-700: #7a7000;
+  --color-yellow-800: #575000;
+  --color-yellow-900: #333000;
+  --color-amber-500: #fef200;
+  --font-display: var(--font-fraunces);
+  --animate-ken-burns: ken-burns 9s ease-out both;
+  --animate-float-soft: float-soft 6s ease-in-out infinite;
+  --animate-drift: drift 24s ease-in-out infinite alternate;
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
@@ -54,8 +70,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #fef200;
+  --primary-foreground: #1c1a00;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -65,7 +81,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: #c9bd00;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -119,11 +135,155 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
+    background-color: #fbfbf8;
+  }
+  ::selection {
+    color: #1c1a00;
+    background: #fef200;
+  }
+  :focus-visible {
+    outline: 3px solid #c9bd00;
+    outline-offset: 3px;
+  }
+
+  /* Todos os elementos clicáveis mostram a "mãozinha" */
+  a[href],
+  button,
+  [role="button"],
+  [role="tab"],
+  [role="option"],
+  [role="menuitem"],
+  [role="radio"],
+  [role="checkbox"],
+  label[for],
+  summary,
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="submit"],
+  input[type="button"],
+  input[type="file"],
+  input[type="date"] {
+    cursor: pointer;
+  }
+
+  label:has(button) {
+    cursor: pointer;
+  }
+
+  ::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
+
+  :disabled,
+  [aria-disabled="true"],
+  [data-disabled] {
+    cursor: not-allowed;
   }
 }
 
-.scrollbar-yellow::-webkit-scrollbar-thumb {
-  background: linear-linear(90deg, #fde047, #facc15, #eab308);
+.site-content {
+  animation: site-enter 500ms ease-out both;
+}
+
+/* Texto escuro sobre o amarelo da logo para manter contraste */
+.bg-yellow-500,
+.bg-yellow-600 {
+  color: #1c1a00;
+}
+
+/* Marcador amarelo por trás de palavras de destaque */
+.highlight {
+  background-image: linear-gradient(transparent 62%, #fef200 62%, #fef200 92%, transparent 92%);
+  padding: 0 0.1em;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.bg-dots {
+  background-image: radial-gradient(rgb(28 26 0 / 0.14) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+/* Só opacidade: um transform aqui faria os elementos "fixed" (janelas) deixarem de centrar no ecrã */
+@keyframes site-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ken-burns {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-40px);
+  }
+  to {
+    transform: translateX(40px);
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Impressão do cartão de membro: só o cartão, no tamanho de um cartão real */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+  body * {
+    visibility: hidden;
+  }
+  #member-card,
+  #member-card * {
+    visibility: visible;
+  }
+  #member-card {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 86mm;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }

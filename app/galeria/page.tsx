@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Portal } from "@/components/ui/portal";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { Expand } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PageHero } from "@/components/ui/page-hero";
+import Lightbox from "@/components/gallery/Lightbox";
 
 const categories = [
   "Todas",
@@ -23,151 +26,112 @@ const images = Array.from({ length: 25 }, (_, i) => {
 
   return {
     src: `/movimento${index === 1 ? "" : index}.jpeg`,
-    title: `${category} ${index}`,
+    title: category,
     category,
   };
 });
 
 export default function GaleriaPage() {
   const [activeCategory, setActiveCategory] = useState("Todas");
-  const [selectedImage, setSelectedImage] = useState<null | (typeof images)[0]>(
-    null
-  );
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const filteredImages =
     activeCategory === "Todas"
       ? images
       : images.filter((img) => img.category === activeCategory);
 
+  const closeLightbox = useCallback(() => setSelectedIndex(null), []);
+
   return (
-    <section className="bg-gray-50 min-h-screen">
+    <section className="bg-[#fbfbf8] min-h-screen">
+      <PageHero
+        image="/movimento2.jpeg"
+        eyebrow="Galeria"
+        title="Galeria Missionária"
+        description="Registos visuais das nossas acções, missões e momentos de fé e partilha."
+      />
 
-      <div className="relative h-[50vh] flex items-center justify-center">
-        <Image
-          src="/movimento2.jpeg"
-          alt="Galeria Missionária"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/60" />
-
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9 }}
-          className="relative z-10 text-center px-6"
-        >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Galeria Missionária
-          </h1>
-          <p className="text-gray-200 max-w-2xl mx-auto text-lg">
-            Registos visuais das nossas acções, missões e momentos de fé e
-            partilha.
-          </p>
-        </motion.div>
-      </div>
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-4 mb-12"
-        >
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={cn(
-                "px-5 py-2 rounded-full text-sm font-semibold transition-all",
-                activeCategory === cat
-                  ? "bg-yellow-500 text-white shadow-md"
-                  : "bg-white text-gray-600 hover:bg-gray-100"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
-        </motion.div>
+      <div className="max-w-7xl mx-auto px-5 py-14 md:py-20">
+        <div className="no-scrollbar -mx-5 mb-10 flex gap-2 overflow-x-auto px-5 md:mx-0 md:justify-center md:px-0">
+          {categories.map((cat) => {
+            const active = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={cn(
+                  "relative isolate shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors",
+                  active
+                    ? "text-gray-950"
+                    : "bg-white text-gray-600 ring-1 ring-gray-200 hover:text-gray-950",
+                )}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="gallery-filter"
+                    className="absolute inset-0 -z-10 rounded-full bg-yellow-500"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                {cat}
+              </button>
+            );
+          })}
+        </div>
 
         <motion.div
           layout
-          className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+          className="grid grid-flow-dense auto-rows-[10rem] md:auto-rows-[15rem] gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         >
-          <AnimatePresence>
-            {filteredImages.map((img) => (
-              <motion.div
+          <AnimatePresence mode="popLayout">
+            {filteredImages.map((img, i) => (
+              <motion.button
                 layout
                 key={img.src}
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.94 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
-                className="relative group cursor-pointer overflow-hidden rounded-2xl"
-                onClick={() => setSelectedImage(img)}
+                exit={{ opacity: 0, scale: 0.94 }}
+                transition={{ duration: 0.35 }}
+                className={cn(
+                  "relative group overflow-hidden rounded-2xl bg-gray-200 text-left",
+                  i % 7 === 0 && "row-span-2",
+                )}
+                onClick={() => setSelectedIndex(i)}
               >
-                <div className="relative h-64">
-                  <Image
-                    src={img.src}
-                    alt={img.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white translate-y-6 group-hover:translate-y-0 transition-transform">
-                    <h3 className="font-bold text-lg">{img.title}</h3>
-                    <span className="text-xs text-gray-200">
-                      {img.category}
-                    </span>
-                  </div>
+                <Image
+                  src={img.src}
+                  alt={img.title}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-gray-950/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                <span className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-gray-900 opacity-0 transition-all duration-300 group-hover:opacity-100">
+                  <Expand className="h-4 w-4" />
+                </span>
+                <div className="absolute inset-x-0 bottom-0 p-4 text-white translate-y-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                  <span className="inline-block rounded-full bg-yellow-500 px-3 py-1 text-xs font-semibold">
+                    {img.category}
+                  </span>
                 </div>
-              </motion.div>
+              </motion.button>
             ))}
           </AnimatePresence>
         </motion.div>
       </div>
 
-      <AnimatePresence>
-        {selectedImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6"
-          >
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
-              transition={{ duration: 0.4 }}
-              className="relative max-w-4xl w-full"
-            >
-              <button
-                onClick={() => setSelectedImage(null)}
-                className="absolute -top-12 right-0 text-white hover:text-yellow-400 transition"
-              >
-                <X size={28} />
-              </button>
-
-              <div className="relative h-[70vh] rounded-2xl overflow-hidden">
-                <Image
-                  src={selectedImage.src}
-                  alt={selectedImage.title}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-6 text-white">
-                  <h3 className="text-2xl font-bold">{selectedImage.title}</h3>
-                  <p className="text-sm text-gray-200">
-                    {selectedImage.category}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Portal>
+        <AnimatePresence>
+          {selectedIndex !== null && (
+            <Lightbox
+              photos={filteredImages}
+              index={selectedIndex}
+              onChange={setSelectedIndex}
+              onClose={closeLightbox}
+            />
+          )}
+        </AnimatePresence>
+      </Portal>
     </section>
   );
 }

@@ -1,46 +1,42 @@
 import Link from "next/link";
-import { ArrowLeft, Home } from "lucide-react";
+import { FileText, Home } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-lg text-center">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#fbfbf8] px-6 pt-[76px]">
+      <div className="bg-dots absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
+      <div className="relative max-w-lg text-center">
+        <p className="font-display text-[8rem] md:text-[10rem] font-semibold leading-none tracking-tight text-gray-950">
+          4<span className="text-yellow-500 [-webkit-text-stroke:3px_#1c1a00]">0</span>4
+        </p>
 
-        <h1 className="text-6xl font-extrabold text-gray-900 tracking-tight">
-          404
-        </h1>
-
-        <h2 className="mt-4 text-2xl font-semibold text-gray-800">
+        <h1 className="mt-2 text-2xl font-semibold text-gray-950">
           Página não encontrada
-        </h2>
+        </h1>
 
         <p className="mt-3 text-gray-600 leading-relaxed">
           A página que estás a procurar não existe, foi removida ou o endereço
           foi digitado incorretamente.
         </p>
 
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl
-            bg-yellow-500 hover:bg-yellow-600 text-white font-semibold
-            transition shadow-sm"
+            className="inline-flex items-center gap-2 rounded-full bg-yellow-500 px-6 py-3 font-semibold transition-colors hover:bg-yellow-400"
           >
             <Home size={18} />
             Voltar ao Início
           </Link>
 
           <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl
-            bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold
-            transition"
+            href="/documentos"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-semibold text-gray-800 ring-1 ring-gray-200 transition-colors hover:bg-gray-50"
           >
-            <ArrowLeft size={18} />
-            Página anterior
+            <FileText size={18} />
+            Ver Documentos
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
