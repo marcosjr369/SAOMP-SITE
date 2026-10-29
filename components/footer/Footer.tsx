@@ -26,7 +26,7 @@ const socials = [
 ];
 
 /* Cores das camadas da paisagem, do horizonte para a frente */
-const GROUND = "#030712"; // igual ao bg-gray-950 do rodapé
+const GROUND = "#030712"; 
 
 function FooterScene() {
   return (
