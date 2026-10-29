@@ -96,7 +96,7 @@ const HeroSection = () => {
               <span className="grid h-10 w-10 place-items-center rounded-full bg-yellow-500 text-gray-950 transition-transform duration-300 group-hover:scale-110">
                 <Church className="h-[18px] w-[18px]" />
               </span>
-              Conhecer o Movimento
+              Conhecer as OMP
             </Link>
           </motion.div>
         </div>

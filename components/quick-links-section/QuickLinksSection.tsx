@@ -35,7 +35,7 @@ const links: QuickLink[] = [
   },
   {
     href: "/sobre",
-    title: "Sobre o Movimento",
+    title: "Sobre as OMP",
     description: "História, padroeiros, fundadores, orações e hinos.",
     icon: BookOpen,
     variant: "dark",

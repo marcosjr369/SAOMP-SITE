@@ -281,7 +281,7 @@ export default function SobrePage() {
 
       <PageHero
         image="/movimento12.jpeg"
-        eyebrow="Sobre o Movimento"
+        eyebrow="Sobre as OMP"
         title="Obras Missionárias Pontifícias"
         description="No coração da Igreja, a serviço da missão universal de anunciar Cristo a todos os povos."
       />

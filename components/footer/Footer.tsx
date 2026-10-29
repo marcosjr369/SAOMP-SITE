@@ -21,7 +21,7 @@ const socials = [
     icon: Facebook,
     external: true,
   },
-  { href: "tel:+244934883685", label: "Telefone: +244 934 883 685", icon: Phone },
+  { href: "tel:+244939103749", label: "Telefone: +244 934 883 685", icon: Phone },
   { href: "mailto:saomp@ompluanda.com", label: "Email: saomp@ompluanda.com", icon: Mail },
 ];
 
