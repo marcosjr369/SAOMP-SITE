@@ -3,6 +3,7 @@
 import { Phone, Mail, Facebook, UserPlus, ArrowUp } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 
 const navLinks = [
@@ -151,7 +152,10 @@ function FooterScene() {
 }
 
 const Footer = () => {
+  const pathname = usePathname();
   const currentYear = new Date().getFullYear();
+
+  if (pathname.startsWith("/admin/membros")) return null;
 
   return (
     <footer className="relative bg-gray-950 text-white">

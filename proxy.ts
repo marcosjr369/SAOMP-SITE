@@ -1,4 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { ADMIN_SESSION_COOKIE } from "./lib/admin-backend";
+
 const BYPASS_COOKIE = "saomp_acesso";
 
 const maintenanceHtml = `<!doctype html>
@@ -32,6 +34,19 @@ const maintenanceHtml = `<!doctype html>
 </html>`;
 
 export function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const isAdminRoute = pathname === "/admin/membros" || pathname.startsWith("/admin/membros/");
+  const isAccessRoute = pathname === "/admin/membros/acesso";
+  const hasAdminSession = request.cookies.has(ADMIN_SESSION_COOKIE);
+
+  if (isAdminRoute && !isAccessRoute && !hasAdminSession) {
+    return NextResponse.redirect(new URL("/admin/membros/acesso", request.url));
+  }
+
+  if (isAccessRoute && hasAdminSession) {
+    return NextResponse.redirect(new URL("/admin/membros", request.url));
+  }
+
   if (process.env.MAINTENANCE_MODE !== "1") return NextResponse.next();
 
   const bypassKey = process.env.MAINTENANCE_BYPASS_KEY;
