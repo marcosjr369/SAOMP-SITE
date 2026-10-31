@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const upstream = await fetch(`${ADMIN_API_URL}/admin/members`, {
+    const upstream = await fetch(ADMIN_API_URL, {
       headers: getBackendHeaders(request),
       cache: "no-store",
     });

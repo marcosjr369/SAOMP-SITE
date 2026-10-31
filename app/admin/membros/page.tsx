@@ -39,6 +39,8 @@ const normalize = (value: string) =>
   value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 function memberStatus(member: Member): "pendente" | "aprovado" {
+  if (normalize(member.tipoMembro ?? "") !== "assessor") return "aprovado";
+
   const status = normalize(member.estado ?? member.status ?? "");
   const isVerified = member.isVerified ?? member.verified;
   return status.includes("pend") || isVerified === false
@@ -69,7 +71,7 @@ export default function AdminMembersPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<Filter>("pendentes");
+  const [filter, setFilter] = useState<Filter>("todos");
   const [search, setSearch] = useState("");
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -141,7 +143,7 @@ export default function AdminMembersPage() {
     try {
       const response = await fetch(
         `/api/admin/members/${encodeURIComponent(id)}/verify`,
-        { method: "POST" },
+        { method: "PATCH" },
       );
       const body = await response.json().catch(() => null);
       if (!response.ok) {

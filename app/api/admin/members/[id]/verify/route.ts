@@ -6,7 +6,7 @@ import {
   getBackendHeaders,
 } from "@/lib/admin-backend";
 
-export async function POST(
+export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> },
 ) {
@@ -22,7 +22,7 @@ export async function POST(
     const upstream = await fetch(
       `${ADMIN_API_URL}/admin/members/${encodeURIComponent(id)}/verify`,
       {
-        method: "POST",
+        method: "PATCH",
         headers: getBackendHeaders(request),
         cache: "no-store",
       },

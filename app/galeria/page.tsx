@@ -17,7 +17,7 @@ const categories = [
   "Juventude",
 ];
 
-const images = Array.from({ length: 25 }, (_, i) => {
+const existingImages = Array.from({ length: 25 }, (_, i) => {
   const index = i + 1;
 
   const categoryMap = ["Evangelização", "Ação Social", "Formação", "Juventude"];
@@ -30,6 +30,33 @@ const images = Array.from({ length: 25 }, (_, i) => {
     category,
   };
 });
+
+const newImages = [
+  { src: "/movimento26.jpeg", title: "Jovens em oração", category: "Juventude" },
+  { src: "/movimento27.jpeg", title: "Jovens em oração", category: "Juventude" },
+  { src: "/movimento28.jpeg", title: "Momento de oração", category: "Juventude" },
+  { src: "/movimento29.jpeg", title: "Celebração de fé", category: "Juventude" },
+  { src: "/movimento30.jpeg", title: "Oração dos jovens", category: "Juventude" },
+  { src: "/movimento31.jpeg", title: "Celebração eucarística", category: "Evangelização" },
+  { src: "/movimento32.jpeg", title: "Jovem missionário em oração", category: "Juventude" },
+  { src: "/movimento33.jpeg", title: "Encontro de religiosas", category: "Formação" },
+  { src: "/movimento34.jpeg", title: "Celebração missionária", category: "Evangelização" },
+  { src: "/movimento35.jpeg", title: "Juventude reunida à noite", category: "Juventude" },
+  { src: "/movimento36.jpeg", title: "Celebração eucarística", category: "Evangelização" },
+  { src: "/movimento37.jpeg", title: "Encontro com o bispo", category: "Evangelização" },
+  { src: "/movimento38.jpeg", title: "Jovens reunidos na igreja", category: "Juventude" },
+  { src: "/movimento39.jpeg", title: "Encontro missionário", category: "Juventude" },
+  { src: "/movimento40.jpeg", title: "Encontro da comunidade missionária", category: "Evangelização" },
+  { src: "/movimento41.jpeg", title: "Terço missionário", category: "Juventude" },
+  { src: "/movimento42.jpeg", title: "Convívio missionário", category: "Juventude" },
+  { src: "/movimento43.jpeg", title: "Jovens em missão", category: "Juventude" },
+  { src: "/movimento44.jpeg", title: "Formação missionária", category: "Formação" },
+  { src: "/movimento45.jpeg", title: "Equipa missionária", category: "Formação" },
+  { src: "/movimento46.jpeg", title: "Encontro missionário", category: "Juventude" },
+  { src: "/movimento47.jpeg", title: "Encontro de religiosas", category: "Formação" },
+];
+
+const images = [...existingImages, ...newImages];
 
 export default function GaleriaPage() {
   const [activeCategory, setActiveCategory] = useState("Todas");

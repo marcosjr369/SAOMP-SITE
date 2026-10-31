@@ -199,6 +199,7 @@ export default function CadastroMembro() {
         paroquia: data.paroquia.trim(),
         anoAdmissao: new Date(`${data.anoAdmissao}-01-01`).toISOString(),
         tipoMembro: data.tipoMembro,
+        isVerified: !isAssessor,
         ...(isAssessor && {
           anoPromessa: Number(data.anoPromessa),
           grupo: data.grupo.trim(),

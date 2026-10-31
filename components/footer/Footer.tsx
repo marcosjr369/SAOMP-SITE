@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 
 const navLinks = [
   { href: "/", label: "Início" },
-  { href: "/sobre", label: "Sobre o Movimento" },
+  { href: "/sobre", label: "Sobre as OMP" },
   { href: "/galeria", label: "Galeria" },
   { href: "/documentos", label: "Documentos" },
   { href: "/buscar-membro", label: "Buscar Membro" },
