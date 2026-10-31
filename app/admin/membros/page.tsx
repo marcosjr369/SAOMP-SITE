@@ -29,6 +29,7 @@ type Member = {
   grupo?: string;
   estado?: string;
   status?: string;
+  isVerified?: boolean;
   verified?: boolean;
 };
 
@@ -39,7 +40,8 @@ const normalize = (value: string) =>
 
 function memberStatus(member: Member): "pendente" | "aprovado" {
   const status = normalize(member.estado ?? member.status ?? "");
-  return status.includes("pend") || member.verified === false
+  const isVerified = member.isVerified ?? member.verified;
+  return status.includes("pend") || isVerified === false
     ? "pendente"
     : "aprovado";
 }
@@ -157,7 +159,7 @@ export default function AdminMembersPage() {
       setMembers((current) =>
         current.map((item) =>
           (item._id ?? item.id) === id
-            ? { ...item, estado: "aprovado", status: "aprovado", verified: true }
+            ? { ...item, estado: "aprovado", status: "aprovado", isVerified: true, verified: true }
             : item,
         ),
       );
