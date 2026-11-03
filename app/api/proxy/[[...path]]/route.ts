@@ -10,6 +10,7 @@ import {
 } from "@/lib/admin-backend";
 import {
   forwardBackendRequest,
+  ProxyConfigurationError,
   sanitizePublicMembers,
   type ProxyTarget,
 } from "@/lib/backend-proxy";
@@ -21,6 +22,19 @@ function jsonResponse(body: unknown, status = 200) {
     status,
     headers: { "Cache-Control": "no-store" },
   });
+}
+
+function proxyFailure(error: unknown) {
+  if (error instanceof ProxyConfigurationError) {
+    return jsonResponse(
+      { message: `Configuração da proxy em falta: ${error.message}.` },
+      503,
+    );
+  }
+  return jsonResponse(
+    { message: "Não foi possível contactar o servidor." },
+    502,
+  );
 }
 
 function clearAdminSession(request: NextRequest) {
@@ -130,11 +144,8 @@ async function proxyRequest(
     if (method === "POST") {
       try {
         return await handleAdminLogin(request);
-      } catch {
-        return jsonResponse(
-          { message: "Não foi possível contactar o servidor de autenticação." },
-          502,
-        );
+      } catch (error) {
+        return proxyFailure(error);
       }
     }
     if (method === "DELETE") return clearAdminSession(request);
@@ -229,10 +240,7 @@ async function proxyRequest(
     return response;
   } catch (error) {
     console.error("[proxy] request failed:", error);
-    return jsonResponse(
-      { message: "Não foi possível contactar o servidor." },
-      502,
-    );
+    return proxyFailure(error);
   }
 }
 

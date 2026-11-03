@@ -103,14 +103,17 @@ export function MemberCard({
   interactive = true,
   className,
   id,
+  side,
 }: {
   data: MemberCardData;
   interactive?: boolean;
   className?: string;
   id?: string;
+  side?: "front" | "back";
 }) {
   const t = themeFor(data.obra);
   const [showBack, setShowBack] = useState(false);
+  const activeSide = side ?? (showBack ? "back" : "front");
 
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -142,15 +145,21 @@ export function MemberCard({
           my.set(0);
         }}
         style={{
-          rotateX: interactive && !showBack ? rotateX : 0,
-          rotateY: showBack ? 180 : interactive ? rotateY : 0,
+          rotateX: !side && interactive && activeSide === "front" ? rotateX : 0,
+          rotateY: side ? 0 : showBack ? 180 : interactive ? rotateY : 0,
           transformStyle: "preserve-3d",
         }}
-        className="member-card relative aspect-[1.586] w-full text-left transition-transform duration-700 [transform-style:preserve-3d]"
+        data-card-side={activeSide}
+        className="member-card-rotator relative aspect-[1.586] w-full text-left transition-transform duration-700 [transform-style:preserve-3d]"
       >
         <div
-          className="member-card absolute inset-0 overflow-hidden rounded-[1.4rem] shadow-[0_30px_60px_-25px_rgb(0_0_0/0.55)] [backface-visibility:hidden]"
-          style={{ backgroundColor: t.bg, color: t.text }}
+          className="member-card-front absolute inset-0 overflow-hidden rounded-[1.4rem] shadow-[0_30px_60px_-25px_rgb(0_0_0/0.55)] [backface-visibility:hidden]"
+          style={{
+            backgroundColor: t.bg,
+            color: t.text,
+            display: side === "back" ? "none" : undefined,
+            backfaceVisibility: side ? "visible" : "hidden",
+          }}
         >
           <CardDecoration theme={t} />
           <div className="relative flex h-full flex-col justify-between p-[6%]">
@@ -252,8 +261,14 @@ export function MemberCard({
         </div>
 
         <div
-          className="member-card absolute inset-0 flex flex-col overflow-hidden rounded-[1.4rem] p-[5%] shadow-[0_30px_60px_-25px_rgb(0_0_0/0.55)] [backface-visibility:hidden] [transform:rotateY(180deg)]"
-          style={{ backgroundColor: t.bg, color: t.text }}
+          className="member-card-back absolute inset-0 flex flex-col overflow-hidden rounded-[1.4rem] p-[5%] shadow-[0_30px_60px_-25px_rgb(0_0_0/0.55)] [backface-visibility:hidden] [transform:rotateY(180deg)]"
+          style={{
+            backgroundColor: t.bg,
+            color: t.text,
+            display: side === "front" ? "none" : "flex",
+            backfaceVisibility: side ? "visible" : "hidden",
+            transform: side ? "none" : "rotateY(180deg)",
+          }}
         >
           <CardDecoration theme={t} />
           <div className="relative flex min-h-0 flex-1 flex-col">
@@ -277,19 +292,21 @@ export function MemberCard({
           </div>
         </div>
       </motion.div>
-      <div className="mt-2 flex justify-end print:hidden">
-        <button
-          type="button"
-          aria-label={
-            showBack ? "Mostrar frente do cartão" : "Mostrar verso do cartão"
-          }
-          onClick={() => setShowBack((current) => !current)}
-          className="inline-flex h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-gray-700 ring-1 ring-gray-300 transition-colors hover:bg-gray-950 hover:text-white hover:ring-gray-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-950"
-        >
-          <RotateCw className="h-3.5 w-3.5" />
-          {showBack ? "Ver frente" : "Ver verso"}
-        </button>
-      </div>
+      {side === undefined && (
+        <div className="mt-2 flex justify-end print:hidden">
+          <button
+            type="button"
+            aria-label={
+              showBack ? "Mostrar frente do cartão" : "Mostrar verso do cartão"
+            }
+            onClick={() => setShowBack((current) => !current)}
+            className="inline-flex h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-gray-700 ring-1 ring-gray-300 transition-colors hover:bg-gray-950 hover:text-white hover:ring-gray-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-950"
+          >
+            <RotateCw className="h-3.5 w-3.5" />
+            {showBack ? "Ver frente" : "Ver verso"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

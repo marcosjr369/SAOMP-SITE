@@ -1,5 +1,12 @@
 export type ProxyTarget = "api" | "backend";
 
+export class ProxyConfigurationError extends Error {
+  constructor(variable: string) {
+    super(`${variable} is not configured`);
+    this.name = "ProxyConfigurationError";
+  }
+}
+
 type MemberRecord = Record<string, unknown>;
 
 const PUBLIC_MEMBER_FIELDS = [
@@ -32,10 +39,8 @@ export async function forwardBackendRequest({
 }: ForwardBackendRequestOptions): Promise<Response> {
   const envName = target === "api" ? "API_URL" : "BACKEND_SERVER";
   const baseUrl = process.env[envName]?.replace(/\/+$/, "");
-  const apiKey = process.env.INTERNAL_API_KEY;
 
-  if (!baseUrl) throw new Error(`${envName} is not configured`);
-  if (!apiKey) throw new Error("INTERNAL_API_KEY is not configured");
+  if (!baseUrl) throw new ProxyConfigurationError(envName);
 
   const pathSegments = path.map((segment) => {
     if (
@@ -51,7 +56,6 @@ export async function forwardBackendRequest({
   const url = `${baseUrl}${pathSegments.length ? `/${pathSegments.join("/")}` : ""}${search}`;
   const headers = new Headers(requestHeaders);
 
-  headers.set("x-api-key", apiKey);
   if (!headers.has("Accept")) headers.set("Accept", "application/json");
 
   const normalizedMethod = method.toUpperCase();

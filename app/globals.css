@@ -199,7 +199,12 @@
 
 /* Marcador amarelo por trás de palavras de destaque */
 .highlight {
-  background-image: linear-gradient(transparent 62%, #fef200 62%, #fef200 92%, transparent 92%);
+  background-image: linear-gradient(
+    transparent 62%,
+    #fef200 62%,
+    #fef200 92%,
+    transparent 92%
+  );
   padding: 0 0.1em;
 }
 
@@ -281,6 +286,71 @@
     left: 0;
     top: 0;
     width: 86mm;
+  }
+  #admin-card-print,
+  #admin-card-print * {
+    visibility: visible;
+  }
+  #admin-card-print {
+    position: absolute;
+    inset: 0;
+    z-index: 9999;
+    display: block;
+    overflow: visible;
+    width: 100%;
+    padding: 0;
+    background: white;
+    backdrop-filter: none;
+  }
+  #admin-card-print .admin-card-print-shell {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  #admin-card-print .admin-card-print-chrome {
+    display: none !important;
+  }
+  #admin-card-print .admin-card-print-faces {
+    display: block;
+  }
+  #admin-card-print .admin-card-print-face {
+    width: 86mm;
+    margin: 0 auto;
+    overflow: visible;
+    break-after: page;
+    page-break-after: always;
+  }
+  #admin-card-print .admin-card-print-face .member-card-rotator {
+    width: 86mm;
+    height: 54.2mm;
+    aspect-ratio: auto;
+    transform: none !important;
+  }
+  #admin-card-print
+    .member-card-rotator[data-card-side="front"]
+    .member-card-back,
+  #admin-card-print
+    .member-card-rotator[data-card-side="back"]
+    .member-card-front {
+    display: none !important;
+  }
+  #admin-card-print
+    .member-card-rotator[data-card-side="back"]
+    .member-card-back {
+    display: flex !important;
+    transform: none !important;
+    backface-visibility: visible !important;
+  }
+  #admin-card-print
+    .admin-card-print-faces
+    section:last-child
+    .admin-card-print-face {
+    break-after: auto;
+    page-break-after: auto;
   }
   * {
     -webkit-print-color-adjust: exact;
