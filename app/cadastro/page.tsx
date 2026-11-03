@@ -28,8 +28,7 @@ import {
   memberNumber,
   themeFor,
 } from "@/components/cadastro/MemberCard";
-
-const API_URL = "https://saomp-back.vercel.app/api";
+import { backendProxyHeaders, backendProxyUrl } from "@/lib/proxy-client";
 
 type FormData = {
   nome: string;
@@ -46,6 +45,10 @@ type FormData = {
   tipoMembro: string;
   anoPromessa: string;
   grupo: string;
+  paiNome: string;
+  paiTelefone: string;
+  maeNome: string;
+  maeTelefone: string;
 };
 
 const initialState: FormData = {
@@ -63,9 +66,15 @@ const initialState: FormData = {
   tipoMembro: "",
   anoPromessa: "",
   grupo: "",
+  paiNome: "",
+  paiTelefone: "",
+  maeNome: "",
+  maeTelefone: "",
 };
 
-type Errors = Partial<Record<keyof FormData, string>>;
+type Errors = Partial<Record<keyof FormData, string>> & {
+  encarregadosEducacao?: string;
+};
 
 const meses = [
   "Janeiro",
@@ -99,9 +108,10 @@ const vigararias = [
   "Santo António",
   "São João Baptista da Cazanga",
   "Nª Sª de Fátima",
-  "Carlos Luanga",
+  "São Carlos Lwanga",
   "São João Calabria",
   "Nª Sª da Conceição",
+  "Santo Agostinho",
 ];
 
 const tipos: {
@@ -137,8 +147,8 @@ const tipos: {
 ];
 
 const steps = [
-  { title: "Dados pessoais", hint: "Quem é você", icon: User },
   { title: "Dados missionários", hint: "Onde serve", icon: BookOpen },
+  { title: "Dados pessoais", hint: "Quem é você", icon: User },
   { title: "Tipo de membro", hint: "Como participa", icon: HandHeart },
   { title: "Revisão", hint: "Confirme tudo", icon: ClipboardCheck },
 ];
@@ -154,21 +164,64 @@ const tipoLabel = (v: string) => tipos.find((t) => t.value === v)?.label ?? "";
 function validate(step: number, d: FormData): Errors {
   const e: Errors = {};
   if (step === 0) {
+    if (!d.obra) e.obra = "Escolha a sua obra.";
+    if (!d.vigararia) e.vigararia = "Escolha a vigararia.";
+    if (!d.paroquia.trim()) e.paroquia = "Indique a paróquia.";
+    if (!d.anoAdmissao) e.anoAdmissao = "Escolha o ano de admissão.";
+
+    if (d.obra === "IAM") {
+      const guardians = [
+        {
+          name: d.paiNome,
+          phone: d.paiTelefone,
+          nameKey: "paiNome",
+          phoneKey: "paiTelefone",
+          label: "pai",
+        },
+        {
+          name: d.maeNome,
+          phone: d.maeTelefone,
+          nameKey: "maeNome",
+          phoneKey: "maeTelefone",
+          label: "mãe",
+        },
+      ] as const;
+      let hasGuardian = false;
+      for (const guardian of guardians) {
+        const hasAnyValue = [guardian.name, guardian.phone].some((value) =>
+          value.trim(),
+        );
+        if (!hasAnyValue) continue;
+        hasGuardian = true;
+
+        const validPhone = /^9\d{8}$/.test(
+          guardian.phone.replace(/\D/g, "").replace(/^244/, ""),
+        );
+        if (!guardian.name.trim()) {
+          e[guardian.nameKey] = `Indique o nome do ${guardian.label}.`;
+        }
+        if (!validPhone) {
+          e[guardian.phoneKey] =
+            `Indique um telefone válido do ${guardian.label}.`;
+        }
+      }
+
+      if (!hasGuardian) {
+        e.encarregadosEducacao =
+          "Indique os dados de pelo menos um encarregado de educação.";
+      }
+    }
+  }
+  if (step === 1) {
     if (d.nome.trim().split(/\s+/).length < 2)
       e.nome = "Escreva o nome e o apelido.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email))
+    if (d.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email.trim()))
       e.email = "Email inválido.";
     if (!/^9\d{8}$/.test(d.telefone.replace(/\D/g, "").replace(/^244/, "")))
       e.telefone = "Número angolano com 9 dígitos, ex.: 923 456 789.";
     if (!d.diaNasc || !d.mesNasc || !d.anoNasc)
       e.anoNasc = "Escolha o dia, o mês e o ano.";
     if (!d.genero) e.genero = "Escolha uma opção.";
-  }
-  if (step === 1) {
-    if (!d.obra) e.obra = "Escolha a sua obra.";
-    if (!d.vigararia) e.vigararia = "Escolha a vigararia.";
-    if (!d.paroquia.trim()) e.paroquia = "Indique a paróquia.";
-    if (!d.anoAdmissao) e.anoAdmissao = "Escolha o ano de admissão.";
   }
   if (step === 2) {
     if (!d.tipoMembro) e.tipoMembro = "Escolha o tipo de membro.";
@@ -212,7 +265,13 @@ export default function CadastroMembro() {
 
   function set<K extends keyof FormData>(field: K, value: FormData[K]) {
     setData((p) => ({ ...p, [field]: value }));
-    if (errors[field]) setErrors((e) => ({ ...e, [field]: undefined }));
+    if (errors[field] || errors.encarregadosEducacao) {
+      setErrors((e) => ({
+        ...e,
+        [field]: undefined,
+        encarregadosEducacao: undefined,
+      }));
+    }
   }
 
   function goTo(target: number) {
@@ -244,7 +303,7 @@ export default function CadastroMembro() {
       );
       const payload = {
         nome: data.nome.trim(),
-        email: data.email.trim(),
+        ...(data.email.trim() && { email: data.email.trim() }),
         telefone: Number(data.telefone.replace(/\D/g, "").replace(/^244/, "")),
         nascimento: nascimento.toISOString(),
         genero: data.genero,
@@ -254,6 +313,24 @@ export default function CadastroMembro() {
         anoAdmissao: new Date(`${data.anoAdmissao}-01-01`).toISOString(),
         tipoMembro: data.tipoMembro,
         isVerified: !isAssessor,
+        ...(data.obra === "IAM" && {
+          encarregadosEducacao: [
+            data.paiNome.trim() && {
+              parentesco: "Pai",
+              nome: data.paiNome.trim(),
+              telefone: Number(
+                data.paiTelefone.replace(/\D/g, "").replace(/^244/, ""),
+              ),
+            },
+            data.maeNome.trim() && {
+              parentesco: "Mãe",
+              nome: data.maeNome.trim(),
+              telefone: Number(
+                data.maeTelefone.replace(/\D/g, "").replace(/^244/, ""),
+              ),
+            },
+          ].filter((guardian) => guardian !== ""),
+        }),
         ...(isAssessor && {
           anoPromessa: Number(data.anoPromessa),
           grupo: data.grupo.trim(),
@@ -261,9 +338,11 @@ export default function CadastroMembro() {
         }),
       };
 
-      const res = await fetch(API_URL, {
+      const res = await fetch(backendProxyUrl(), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: backendProxyHeaders("api", {
+          "Content-Type": "application/json",
+        }),
         body: JSON.stringify(payload),
       });
       const body = await res.json().catch(() => null);
@@ -473,7 +552,7 @@ export default function CadastroMembro() {
               >
                 <StepHeader index={step} />
 
-                {step === 0 && (
+                {step === 1 && (
                   <div className="grid gap-5 md:grid-cols-2">
                     <Field
                       label="Nome completo"
@@ -488,7 +567,7 @@ export default function CadastroMembro() {
                         className={inputCls(errors.nome)}
                       />
                     </Field>
-                    <Field label="Email" error={errors.email}>
+                    <Field label="Email (opcional)" error={errors.email}>
                       <input
                         type="email"
                         value={data.email}
@@ -596,7 +675,7 @@ export default function CadastroMembro() {
                   </div>
                 )}
 
-                {step === 1 && (
+                {step === 0 && (
                   <div className="grid gap-5 md:grid-cols-2">
                     <Field
                       label="Obra"
@@ -677,6 +756,95 @@ export default function CadastroMembro() {
                         ))}
                       </select>
                     </Field>
+                    {data.obra === "IAM" && (
+                      <div className="md:col-span-2 rounded-2xl border border-yellow-500/50 bg-yellow-500/5 p-5">
+                        <div className="mb-5">
+                          <h3 className="font-semibold text-gray-950">
+                            Encarregados de educação
+                          </h3>
+                          <p className="mt-1 text-sm text-gray-600">
+                            Indique pelo menos um responsável. Pode preencher os
+                            dados do pai, da mãe ou de ambos.
+                          </p>
+                          {errors.encarregadosEducacao && (
+                            <p
+                              role="alert"
+                              className="mt-2 text-sm font-medium text-red-600"
+                            >
+                              {errors.encarregadosEducacao}
+                            </p>
+                          )}
+                        </div>
+                        <div className="grid gap-6 sm:grid-cols-2">
+                          <div className="grid gap-4">
+                            <h4 className="text-sm font-semibold text-gray-800">
+                              Pai
+                            </h4>
+                            <Field label="Nome do pai" error={errors.paiNome}>
+                              <input
+                                value={data.paiNome}
+                                onChange={(event) =>
+                                  set("paiNome", event.target.value)
+                                }
+                                autoComplete="off"
+                                className={inputCls(errors.paiNome)}
+                              />
+                            </Field>
+                            <Field
+                              label="Telefone do pai"
+                              error={errors.paiTelefone}
+                            >
+                              <input
+                                type="tel"
+                                inputMode="numeric"
+                                value={data.paiTelefone}
+                                onChange={(event) =>
+                                  set(
+                                    "paiTelefone",
+                                    event.target.value.replace(/[^\d ]/g, ""),
+                                  )
+                                }
+                                placeholder="923 456 789"
+                                className={inputCls(errors.paiTelefone)}
+                              />
+                            </Field>
+                          </div>
+                          <div className="grid gap-4">
+                            <h4 className="text-sm font-semibold text-gray-800">
+                              Mãe
+                            </h4>
+                            <Field label="Nome da mãe" error={errors.maeNome}>
+                              <input
+                                value={data.maeNome}
+                                onChange={(event) =>
+                                  set("maeNome", event.target.value)
+                                }
+                                autoComplete="off"
+                                className={inputCls(errors.maeNome)}
+                              />
+                            </Field>
+                            <Field
+                              label="Telefone da mãe"
+                              error={errors.maeTelefone}
+                            >
+                              <input
+                                type="tel"
+                                inputMode="numeric"
+                                value={data.maeTelefone}
+                                onChange={(event) =>
+                                  set(
+                                    "maeTelefone",
+                                    event.target.value.replace(/[^\d ]/g, ""),
+                                  )
+                                }
+                                placeholder="923 456 789"
+                                className={inputCls(errors.maeTelefone)}
+                              />
+                            </Field>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -833,10 +1001,10 @@ export default function CadastroMembro() {
                     </div>
                     <Review
                       title="Dados pessoais"
-                      onEdit={() => goTo(0)}
+                      onEdit={() => goTo(1)}
                       items={[
                         ["Nome", data.nome],
-                        ["Email", data.email],
+                        ["Email", data.email || "Não informado"],
                         ["Telefone", `+244 ${data.telefone}`],
                         [
                           "Nascimento",
@@ -847,7 +1015,7 @@ export default function CadastroMembro() {
                     />
                     <Review
                       title="Dados missionários"
-                      onEdit={() => goTo(1)}
+                      onEdit={() => goTo(0)}
                       items={[
                         [
                           "Obra",
@@ -857,6 +1025,22 @@ export default function CadastroMembro() {
                         ["Vigararia", data.vigararia],
                         ["Paróquia", data.paroquia],
                         ["Ano de admissão", data.anoAdmissao],
+                        ...(data.obra === "IAM"
+                          ? ([
+                              ...(data.paiNome.trim()
+                                ? [
+                                    ["Encarregado (pai)", data.paiNome.trim()],
+                                    ["Telefone do pai", data.paiTelefone],
+                                  ]
+                                : []),
+                              ...(data.maeNome.trim()
+                                ? [
+                                    ["Encarregada (mãe)", data.maeNome.trim()],
+                                    ["Telefone da mãe", data.maeTelefone],
+                                  ]
+                                : []),
+                            ] as [string, string][])
+                          : []),
                       ]}
                     />
                     <Review

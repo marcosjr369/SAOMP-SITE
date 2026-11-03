@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Portal } from "@/components/ui/portal";
+import { backendProxyHeaders, backendProxyUrl } from "@/lib/proxy-client";
 import { cn } from "@/lib/utils";
 import {
   User,
@@ -31,8 +32,6 @@ type Membro = {
 };
 
 type MembroApi = Membro;
-
-const API_URL = "/api/members";
 
 const normalize = (s: string) =>
   (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -112,7 +111,10 @@ export default function BuscaMembros() {
 
     async function fetchMembros() {
       try {
-        const res = await fetch(API_URL, { signal: controller.signal });
+        const res = await fetch(backendProxyUrl(), {
+          signal: controller.signal,
+          headers: backendProxyHeaders("api"),
+        });
         const data = await res.json().catch(() => null);
 
         if (!res.ok) {

@@ -1,5 +1,19 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Backend Proxy
+
+All browser requests to backend endpoints should use `/api/proxy`. The server-side proxy keeps backend hosts and the internal API key out of the browser. Add `x-proxy-base: api` to use `API_URL`; omit it to use `BACKEND_SERVER`.
+
+Copy `.env.example` to `.env.local` and configure:
+
+```env
+API_URL=https://your-api-host.example/api
+BACKEND_SERVER=https://your-backend-host.example
+INTERNAL_API_KEY=your-internal-api-key
+```
+
+`API_URL` is the API root (for example, ending in `/api`). Set `BACKEND_SERVER` to the base URL for other backend endpoints, and use the internal API key expected by that service. Keep `INTERNAL_API_KEY` private. Public member-list reads and member registration are available without an admin session; all other endpoints require the admin session.
+
 ## Getting Started
 
 First, run the development server:

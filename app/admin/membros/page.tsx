@@ -11,6 +11,7 @@ import {
   Search,
   Users,
 } from "lucide-react";
+import { backendProxyHeaders, backendProxyUrl } from "@/lib/proxy-client";
 
 type Member = {
   _id?: string;
@@ -85,15 +86,17 @@ export default function AdminMembersPage() {
     setError(null);
 
     try {
-      const response = await fetch("/api/admin/members", {
+      const response = await fetch(backendProxyUrl(["admin", "members"]), {
         cache: "no-store",
+        headers: backendProxyHeaders("api"),
       });
       const body = await response.json().catch(() => null);
       if (!response.ok) {
         if (response.status === 401) {
-          await fetch("/api/admin/login", { method: "DELETE" }).catch(
-            () => null,
-          );
+          await fetch(backendProxyUrl(["admin", "login"]), {
+            method: "DELETE",
+            headers: backendProxyHeaders("api"),
+          }).catch(() => null);
           window.location.replace("/admin/membros/acesso");
           return;
         }
@@ -160,15 +163,16 @@ export default function AdminMembersPage() {
     setNotice(null);
     try {
       const response = await fetch(
-        `/api/admin/members/${encodeURIComponent(id)}/verify`,
-        { method: "PATCH" },
+        backendProxyUrl(["admin", "members", id, "verify"]),
+        { method: "PATCH", headers: backendProxyHeaders("api") },
       );
       const body = await response.json().catch(() => null);
       if (!response.ok) {
         if (response.status === 401) {
-          await fetch("/api/admin/login", { method: "DELETE" }).catch(
-            () => null,
-          );
+          await fetch(backendProxyUrl(["admin", "login"]), {
+            method: "DELETE",
+            headers: backendProxyHeaders("api"),
+          }).catch(() => null);
           window.location.replace("/admin/membros/acesso");
           return;
         }

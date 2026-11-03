@@ -3,7 +3,6 @@ import type { NextRequest, NextResponse } from "next/server";
 export const ADMIN_SESSION_COOKIE = "saomp_admin_session";
 export const ADMIN_TOKEN_COOKIE = "saomp_admin_token";
 export const ADMIN_SESSION_SECONDS = 60 * 60 * 8;
-export const ADMIN_API_URL = "https://saomp-back.vercel.app/api";
 
 const tokenKeys = new Set(["token", "accessToken", "access_token", "jwt"]);
 
@@ -41,11 +40,15 @@ export function getBackendHeaders(request: NextRequest) {
   const token = request.cookies.get(ADMIN_TOKEN_COOKIE)?.value;
   const forwardedCookies = request.cookies
     .getAll()
-    .filter(({ name }) => name !== ADMIN_SESSION_COOKIE && name !== ADMIN_TOKEN_COOKIE)
+    .filter(
+      ({ name }) =>
+        name !== ADMIN_SESSION_COOKIE && name !== ADMIN_TOKEN_COOKIE,
+    )
     .map(({ name, value }) => `${name}=${value}`);
 
   if (token) headers.set("Authorization", `Bearer ${token}`);
-  if (forwardedCookies.length) headers.set("Cookie", forwardedCookies.join("; "));
+  if (forwardedCookies.length)
+    headers.set("Cookie", forwardedCookies.join("; "));
   return headers;
 }
 
@@ -59,9 +62,14 @@ export function copyBackendCookies(source: Headers, response: NextResponse) {
         const lower = attribute.toLowerCase();
         return !lower.startsWith("domain=") && !lower.startsWith("path=");
       })
-      .filter((attribute) => process.env.NODE_ENV === "production" || attribute.toLowerCase() !== "secure")
+      .filter(
+        (attribute) =>
+          process.env.NODE_ENV === "production" ||
+          attribute.toLowerCase() !== "secure",
+      )
       .map((attribute) =>
-        process.env.NODE_ENV !== "production" && attribute.toLowerCase() === "samesite=none"
+        process.env.NODE_ENV !== "production" &&
+        attribute.toLowerCase() === "samesite=none"
           ? "SameSite=Lax"
           : attribute,
       );

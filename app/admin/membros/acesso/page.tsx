@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { ArrowRight, KeyRound, LoaderCircle, ShieldCheck } from "lucide-react";
+import { backendProxyHeaders, backendProxyUrl } from "@/lib/proxy-client";
 
 export default function AdminAccessPage() {
   const [email, setEmail] = useState("");
@@ -16,13 +17,16 @@ export default function AdminAccessPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/admin/login", {
+      const response = await fetch(backendProxyUrl(["admin", "login"]), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: backendProxyHeaders("api", {
+          "Content-Type": "application/json",
+        }),
         body: JSON.stringify({ email: email.trim(), password }),
       });
       const responseText = await response.text();
-      let body: { message?: string; error?: { message?: string } } | null = null;
+      let body: { message?: string; error?: { message?: string } } | null =
+        null;
       try {
         body = JSON.parse(responseText);
       } catch {
@@ -57,11 +61,21 @@ export default function AdminAccessPage() {
           <div className="absolute -right-10 -top-10 h-52 w-52 rounded-full border border-white/10" />
           <div className="relative flex items-center gap-3">
             <span className="relative h-11 w-11 overflow-hidden rounded-lg bg-white">
-              <Image src="/logo.jpeg" alt="SAOMP" fill sizes="44px" className="object-cover" />
+              <Image
+                src="/logo.jpeg"
+                alt="SAOMP"
+                fill
+                sizes="44px"
+                className="object-cover"
+              />
             </span>
             <span>
-              <span className="block font-display text-xl font-semibold">SAOMP</span>
-              <span className="text-[10px] uppercase tracking-[0.16em] text-white/55">Área reservada</span>
+              <span className="block font-display text-xl font-semibold">
+                SAOMP
+              </span>
+              <span className="text-[10px] uppercase tracking-[0.16em] text-white/55">
+                Área reservada
+              </span>
             </span>
           </div>
           <div className="relative mt-10 max-w-md">
@@ -86,9 +100,14 @@ export default function AdminAccessPage() {
             <h2 className="mt-6 font-display text-3xl font-semibold text-gray-950">
               Entrar no painel
             </h2>
-            <p className="mt-2 text-sm text-gray-500">Entre com as credenciais da sua conta administradora.</p>
+            <p className="mt-2 text-sm text-gray-500">
+              Entre com as credenciais da sua conta administradora.
+            </p>
 
-            <label htmlFor="admin-email" className="mt-8 block text-sm font-medium text-gray-800">
+            <label
+              htmlFor="admin-email"
+              className="mt-8 block text-sm font-medium text-gray-800"
+            >
               Email
             </label>
             <input
@@ -102,7 +121,10 @@ export default function AdminAccessPage() {
               className="mt-2 h-12 w-full border border-gray-300 bg-white px-3 text-sm text-gray-950 outline-none transition focus:border-gray-950"
             />
 
-            <label htmlFor="admin-password" className="mt-5 block text-sm font-medium text-gray-800">
+            <label
+              htmlFor="admin-password"
+              className="mt-5 block text-sm font-medium text-gray-800"
+            >
               Palavra-passe
             </label>
             <input
@@ -116,7 +138,10 @@ export default function AdminAccessPage() {
             />
 
             {error && (
-              <p role="alert" className="mt-3 border-l-2 border-red-600 bg-red-50 px-3 py-2 text-sm text-red-800">
+              <p
+                role="alert"
+                className="mt-3 border-l-2 border-red-600 bg-red-50 px-3 py-2 text-sm text-red-800"
+              >
                 {error}
               </p>
             )}
@@ -126,7 +151,11 @@ export default function AdminAccessPage() {
               disabled={loading || !email || !password}
               className="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 bg-gray-950 px-4 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? <LoaderCircle size={17} className="animate-spin" /> : <ArrowRight size={17} />}
+              {loading ? (
+                <LoaderCircle size={17} className="animate-spin" />
+              ) : (
+                <ArrowRight size={17} />
+              )}
               {loading ? "A validar..." : "Aceder"}
             </button>
           </form>
