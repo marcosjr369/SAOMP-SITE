@@ -19,10 +19,11 @@ export async function GET(request: NextRequest) {
       headers: getBackendHeaders(request),
       cache: "no-store",
     });
-    const response = new NextResponse(await upstream.text() || null, {
+    const response = new NextResponse((await upstream.text()) || null, {
       status: upstream.status,
       headers: {
-        "Content-Type": upstream.headers.get("content-type") || "application/json",
+        "Content-Type":
+          upstream.headers.get("content-type") || "application/json",
         "Cache-Control": "no-store",
       },
     });

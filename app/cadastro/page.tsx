@@ -23,7 +23,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { MemberCard, memberNumber, themeFor } from "@/components/cadastro/MemberCard";
+import {
+  MemberCard,
+  memberNumber,
+  themeFor,
+} from "@/components/cadastro/MemberCard";
 
 const API_URL = "https://saomp-back.vercel.app/api";
 
@@ -64,14 +68,28 @@ const initialState: FormData = {
 type Errors = Partial<Record<keyof FormData, string>>;
 
 const meses = [
-  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
 ];
 
 // Valores iguais aos que a API já recebe
 const obras = [
   { value: "IAM", label: "Infância e Adolescência Missionária", sigla: "IAM" },
-  { value: "Liga Missionária", label: "Liga Missionária Juvenil", sigla: "LMJ" },
+  {
+    value: "Liga Missionária",
+    label: "Liga Missionária Juvenil",
+    sigla: "LMJ",
+  },
   { value: "Familia Missionária", label: "Família Missionária", sigla: "FM" },
   { value: "União Missionária", label: "União Missionária", sigla: "UM" },
 ];
@@ -86,11 +104,36 @@ const vigararias = [
   "Nª Sª da Conceição",
 ];
 
-const tipos: { value: string; label: string; icon: LucideIcon; description: string }[] = [
-  { value: "Oracao", label: "Oração", icon: HandHeart, description: "Apoia a missão com a oração diária." },
-  { value: "Promessa", label: "Promessa", icon: BookOpen, description: "Fez a promessa e vive o compromisso missionário." },
-  { value: "Assessor", label: "Assessor", icon: Sparkles, description: "Acompanha e orienta um grupo. Requer aprovação." },
-  { value: "Director", label: "Director", icon: Crown, description: "Coordena a obra na sua comunidade." },
+const tipos: {
+  value: string;
+  label: string;
+  icon: LucideIcon;
+  description: string;
+}[] = [
+  {
+    value: "Oracao",
+    label: "Oração",
+    icon: HandHeart,
+    description: "Apoia a missão com a oração diária.",
+  },
+  {
+    value: "Promessa",
+    label: "Promessa",
+    icon: BookOpen,
+    description: "Fez a promessa e vive o compromisso missionário.",
+  },
+  {
+    value: "Assessor",
+    label: "Assessor",
+    icon: Sparkles,
+    description: "Acompanha e orienta um grupo. Requer aprovação.",
+  },
+  {
+    value: "Director",
+    label: "Director",
+    icon: Crown,
+    description: "Coordena a obra na sua comunidade.",
+  },
 ];
 
 const steps = [
@@ -102,18 +145,23 @@ const steps = [
 
 const currentYear = new Date().getFullYear();
 const anos = (from: number) =>
-  Array.from({ length: currentYear - from + 1 }, (_, i) => String(currentYear - i));
+  Array.from({ length: currentYear - from + 1 }, (_, i) =>
+    String(currentYear - i),
+  );
 
 const tipoLabel = (v: string) => tipos.find((t) => t.value === v)?.label ?? "";
 
 function validate(step: number, d: FormData): Errors {
   const e: Errors = {};
   if (step === 0) {
-    if (d.nome.trim().split(/\s+/).length < 2) e.nome = "Escreva o nome e o apelido.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) e.email = "Email inválido.";
+    if (d.nome.trim().split(/\s+/).length < 2)
+      e.nome = "Escreva o nome e o apelido.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email))
+      e.email = "Email inválido.";
     if (!/^9\d{8}$/.test(d.telefone.replace(/\D/g, "").replace(/^244/, "")))
       e.telefone = "Número angolano com 9 dígitos, ex.: 923 456 789.";
-    if (!d.diaNasc || !d.mesNasc || !d.anoNasc) e.anoNasc = "Escolha o dia, o mês e o ano.";
+    if (!d.diaNasc || !d.mesNasc || !d.anoNasc)
+      e.anoNasc = "Escolha o dia, o mês e o ano.";
     if (!d.genero) e.genero = "Escolha uma opção.";
   }
   if (step === 1) {
@@ -156,7 +204,9 @@ export default function CadastroMembro() {
   const [shake, setShake] = useState(0);
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [done, setDone] = useState<{ numero: string; data: FormData } | null>(null);
+  const [done, setDone] = useState<{ numero: string; data: FormData } | null>(
+    null,
+  );
 
   const isAssessor = data.tipoMembro === "Assessor";
 
@@ -186,7 +236,11 @@ export default function CadastroMembro() {
     setLoading(true);
     try {
       const nascimento = new Date(
-        Date.UTC(Number(data.anoNasc), Number(data.mesNasc) - 1, Number(data.diaNasc)),
+        Date.UTC(
+          Number(data.anoNasc),
+          Number(data.mesNasc) - 1,
+          Number(data.diaNasc),
+        ),
       );
       const payload = {
         nome: data.nome.trim(),
@@ -213,7 +267,10 @@ export default function CadastroMembro() {
         body: JSON.stringify(payload),
       });
       const body = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(body?.message || "Não foi possível concluir o cadastro.");
+      if (!res.ok)
+        throw new Error(
+          body?.message || "Não foi possível concluir o cadastro.",
+        );
 
       const id: string | undefined = body?.member?._id ?? body?._id;
       setDone({ numero: numeroFor(data, id), data });
@@ -280,7 +337,8 @@ export default function CadastroMembro() {
               {/* Passos (desktop) */}
               <ol className="mt-8 hidden space-y-2 lg:block">
                 {steps.map((s, i) => {
-                  const state = i < step ? "done" : i === step ? "current" : "todo";
+                  const state =
+                    i < step ? "done" : i === step ? "current" : "todo";
                   const Icon = s.icon;
                   return (
                     <li key={s.title}>
@@ -298,7 +356,11 @@ export default function CadastroMembro() {
                           <motion.span
                             layoutId="step-current"
                             className="absolute inset-0 -z-10 rounded-2xl bg-white/10 ring-1 ring-white/15"
-                            transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 380,
+                              damping: 32,
+                            }}
                           />
                         )}
                         <span
@@ -306,7 +368,8 @@ export default function CadastroMembro() {
                             "grid h-10 w-10 shrink-0 place-items-center rounded-xl transition-colors duration-300",
                             state === "done" && "bg-yellow-500 text-gray-950",
                             state === "current" && "bg-white text-gray-950",
-                            state === "todo" && "bg-white/5 ring-1 ring-white/10",
+                            state === "todo" &&
+                              "bg-white/5 ring-1 ring-white/10",
                           )}
                         >
                           <AnimatePresence mode="wait" initial={false}>
@@ -315,20 +378,32 @@ export default function CadastroMembro() {
                                 key="ok"
                                 initial={{ scale: 0, rotate: -90 }}
                                 animate={{ scale: 1, rotate: 0 }}
-                                transition={{ type: "spring", stiffness: 500, damping: 18 }}
+                                transition={{
+                                  type: "spring",
+                                  stiffness: 500,
+                                  damping: 18,
+                                }}
                               >
                                 <Check className="h-4 w-4" strokeWidth={3} />
                               </motion.span>
                             ) : (
-                              <motion.span key="icon" initial={{ scale: 0.6 }} animate={{ scale: 1 }}>
+                              <motion.span
+                                key="icon"
+                                initial={{ scale: 0.6 }}
+                                animate={{ scale: 1 }}
+                              >
                                 <Icon className="h-4 w-4" />
                               </motion.span>
                             )}
                           </AnimatePresence>
                         </span>
                         <span>
-                          <span className="block text-sm font-semibold">{s.title}</span>
-                          <span className="block text-xs text-white/50">{s.hint}</span>
+                          <span className="block text-sm font-semibold">
+                            {s.title}
+                          </span>
+                          <span className="block text-xs text-white/50">
+                            {s.hint}
+                          </span>
                         </span>
                       </button>
                     </li>
@@ -354,7 +429,10 @@ export default function CadastroMembro() {
             <div className="mb-3 flex items-center justify-between text-sm">
               <span className="font-semibold text-gray-950">
                 Passo {step + 1} de {steps.length}
-                <span className="font-normal text-gray-500"> · {steps[step].title}</span>
+                <span className="font-normal text-gray-500">
+                  {" "}
+                  · {steps[step].title}
+                </span>
               </span>
               <span className="tabular-nums text-gray-400">
                 {Math.round(((step + 1) / steps.length) * 100)}%
@@ -362,7 +440,10 @@ export default function CadastroMembro() {
             </div>
             <div className="flex gap-1.5">
               {steps.map((s, i) => (
-                <div key={s.title} className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200">
+                <div
+                  key={s.title}
+                  className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200"
+                >
                   <motion.div
                     className="h-full rounded-full bg-gray-950"
                     initial={false}
@@ -394,7 +475,11 @@ export default function CadastroMembro() {
 
                 {step === 0 && (
                   <div className="grid gap-5 md:grid-cols-2">
-                    <Field label="Nome completo" error={errors.nome} className="md:col-span-2">
+                    <Field
+                      label="Nome completo"
+                      error={errors.nome}
+                      className="md:col-span-2"
+                    >
                       <input
                         value={data.nome}
                         onChange={(e) => set("nome", e.target.value)}
@@ -421,23 +506,37 @@ export default function CadastroMembro() {
                         <input
                           inputMode="numeric"
                           value={data.telefone}
-                          onChange={(e) => set("telefone", e.target.value.replace(/[^\d ]/g, ""))}
+                          onChange={(e) =>
+                            set(
+                              "telefone",
+                              e.target.value.replace(/[^\d ]/g, ""),
+                            )
+                          }
                           placeholder="923 456 789"
                           autoComplete="tel-national"
                           className={cn(inputCls(errors.telefone), "pl-16")}
                         />
                       </div>
                     </Field>
-                    <Field label="Data de nascimento" error={errors.anoNasc} className="md:col-span-2">
+                    <Field
+                      label="Data de nascimento"
+                      error={errors.anoNasc}
+                      className="md:col-span-2"
+                    >
                       <div className="grid grid-cols-[1fr_1.4fr_1.15fr] gap-2 sm:gap-3">
                         <select
                           value={data.diaNasc}
                           onChange={(e) => set("diaNasc", e.target.value)}
-                          className={cn(inputCls(errors.anoNasc && !data.diaNasc), "px-2.5 sm:px-4")}
+                          className={cn(
+                            inputCls(errors.anoNasc && !data.diaNasc),
+                            "px-2.5 sm:px-4",
+                          )}
                           aria-label="Dia"
                         >
                           <option value="">Dia</option>
-                          {Array.from({ length: 31 }, (_, i) => String(i + 1)).map((d) => (
+                          {Array.from({ length: 31 }, (_, i) =>
+                            String(i + 1),
+                          ).map((d) => (
                             <option key={d} value={d}>
                               {d}
                             </option>
@@ -446,7 +545,10 @@ export default function CadastroMembro() {
                         <select
                           value={data.mesNasc}
                           onChange={(e) => set("mesNasc", e.target.value)}
-                          className={cn(inputCls(errors.anoNasc && !data.mesNasc), "px-2.5 sm:px-4")}
+                          className={cn(
+                            inputCls(errors.anoNasc && !data.mesNasc),
+                            "px-2.5 sm:px-4",
+                          )}
                           aria-label="Mês"
                         >
                           <option value="">Mês</option>
@@ -459,7 +561,10 @@ export default function CadastroMembro() {
                         <select
                           value={data.anoNasc}
                           onChange={(e) => set("anoNasc", e.target.value)}
-                          className={cn(inputCls(errors.anoNasc && !data.anoNasc), "px-2.5 sm:px-4")}
+                          className={cn(
+                            inputCls(errors.anoNasc && !data.anoNasc),
+                            "px-2.5 sm:px-4",
+                          )}
                           aria-label="Ano"
                         >
                           <option value="">Ano</option>
@@ -471,10 +576,18 @@ export default function CadastroMembro() {
                         </select>
                       </div>
                     </Field>
-                    <Field label="Género" error={errors.genero} className="md:col-span-2">
+                    <Field
+                      label="Género"
+                      error={errors.genero}
+                      className="md:col-span-2"
+                    >
                       <div className="grid grid-cols-2 gap-3">
                         {["Masculino", "Feminino"].map((g) => (
-                          <ChoicePill key={g} selected={data.genero === g} onClick={() => set("genero", g)}>
+                          <ChoicePill
+                            key={g}
+                            selected={data.genero === g}
+                            onClick={() => set("genero", g)}
+                          >
                             {g}
                           </ChoicePill>
                         ))}
@@ -485,7 +598,11 @@ export default function CadastroMembro() {
 
                 {step === 1 && (
                   <div className="grid gap-5 md:grid-cols-2">
-                    <Field label="Obra" error={errors.obra} className="md:col-span-2">
+                    <Field
+                      label="Obra"
+                      error={errors.obra}
+                      className="md:col-span-2"
+                    >
                       <div className="grid gap-3 sm:grid-cols-2">
                         {obras.map((o) => {
                           const selected = data.obra === o.value;
@@ -509,12 +626,16 @@ export default function CadastroMembro() {
                                 style={{
                                   backgroundColor: t.bg,
                                   color: t.text,
-                                  transform: selected ? "rotate(-6deg) scale(1.08)" : "none",
+                                  transform: selected
+                                    ? "rotate(-6deg) scale(1.08)"
+                                    : "none",
                                 }}
                               >
                                 {o.sigla}
                               </span>
-                              <span className="text-sm font-semibold leading-snug">{o.label}</span>
+                              <span className="text-sm font-semibold leading-snug">
+                                {o.label}
+                              </span>
                             </motion.button>
                           );
                         })}
@@ -561,7 +682,10 @@ export default function CadastroMembro() {
 
                 {step === 2 && (
                   <div>
-                    <Field label="Como participa na obra?" error={errors.tipoMembro}>
+                    <Field
+                      label="Como participa na obra?"
+                      error={errors.tipoMembro}
+                    >
                       <div className="grid gap-3 sm:grid-cols-2">
                         {tipos.map((t) => {
                           const selected = data.tipoMembro === t.value;
@@ -581,21 +705,34 @@ export default function CadastroMembro() {
                               )}
                             >
                               <motion.span
-                                animate={selected ? { rotate: [0, -12, 8, 0], scale: [1, 1.15, 1] } : {}}
+                                animate={
+                                  selected
+                                    ? {
+                                        rotate: [0, -12, 8, 0],
+                                        scale: [1, 1.15, 1],
+                                      }
+                                    : {}
+                                }
                                 transition={{ duration: 0.5 }}
                                 className={cn(
                                   "grid h-11 w-11 shrink-0 place-items-center rounded-xl transition-colors",
-                                  selected ? "bg-yellow-500 text-gray-950" : "bg-yellow-500/20 text-gray-900",
+                                  selected
+                                    ? "bg-yellow-500 text-gray-950"
+                                    : "bg-yellow-500/20 text-gray-900",
                                 )}
                               >
                                 <Icon className="h-5 w-5" />
                               </motion.span>
                               <span className="pr-6">
-                                <span className="block font-semibold">{t.label}</span>
+                                <span className="block font-semibold">
+                                  {t.label}
+                                </span>
                                 <span
                                   className={cn(
                                     "mt-0.5 block text-sm",
-                                    selected ? "text-white/60" : "text-gray-500",
+                                    selected
+                                      ? "text-white/60"
+                                      : "text-gray-500",
                                   )}
                                 >
                                   {t.description}
@@ -607,7 +744,10 @@ export default function CadastroMembro() {
                                   animate={{ scale: 1 }}
                                   className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-yellow-500 text-gray-950"
                                 >
-                                  <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                                  <Check
+                                    className="h-3.5 w-3.5"
+                                    strokeWidth={3}
+                                  />
                                 </motion.span>
                               )}
                             </motion.button>
@@ -622,7 +762,10 @@ export default function CadastroMembro() {
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                          transition={{
+                            duration: 0.4,
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
                           className="overflow-hidden"
                         >
                           <div className="mt-6 rounded-2xl border border-yellow-500/60 bg-yellow-500/10 p-5">
@@ -635,16 +778,22 @@ export default function CadastroMembro() {
                                   O registo de Assessor precisa de aprovação
                                 </p>
                                 <p className="mt-0.5 text-sm text-gray-600">
-                                  Depois de enviar, o Secretariado vai validar os seus dados. O seu
-                                  cartão fica com o estado «Aguarda aprovação» até ser confirmado.
+                                  Depois de enviar, o Secretariado vai validar
+                                  os seus dados. O seu cartão fica com o estado
+                                  «Aguarda aprovação» até ser confirmado.
                                 </p>
                               </div>
                             </div>
                             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                              <Field label="Ano da promessa" error={errors.anoPromessa}>
+                              <Field
+                                label="Ano da promessa"
+                                error={errors.anoPromessa}
+                              >
                                 <select
                                   value={data.anoPromessa}
-                                  onChange={(e) => set("anoPromessa", e.target.value)}
+                                  onChange={(e) =>
+                                    set("anoPromessa", e.target.value)
+                                  }
                                   className={inputCls(errors.anoPromessa)}
                                 >
                                   <option value="">Escolha o ano</option>
@@ -655,7 +804,10 @@ export default function CadastroMembro() {
                                   ))}
                                 </select>
                               </Field>
-                              <Field label="Grupo a que pertence" error={errors.grupo}>
+                              <Field
+                                label="Grupo a que pertence"
+                                error={errors.grupo}
+                              >
                                 <input
                                   value={data.grupo}
                                   onChange={(e) => set("grupo", e.target.value)}
@@ -674,7 +826,10 @@ export default function CadastroMembro() {
                 {step === 3 && (
                   <div className="space-y-4">
                     <div className="lg:hidden">
-                      <MemberCard data={cardData} className="mx-auto max-w-sm" />
+                      <MemberCard
+                        data={cardData}
+                        className="mx-auto max-w-sm"
+                      />
                     </div>
                     <Review
                       title="Dados pessoais"
@@ -694,7 +849,11 @@ export default function CadastroMembro() {
                       title="Dados missionários"
                       onEdit={() => goTo(1)}
                       items={[
-                        ["Obra", obras.find((o) => o.value === data.obra)?.label ?? data.obra],
+                        [
+                          "Obra",
+                          obras.find((o) => o.value === data.obra)?.label ??
+                            data.obra,
+                        ],
                         ["Vigararia", data.vigararia],
                         ["Paróquia", data.paroquia],
                         ["Ano de admissão", data.anoAdmissao],
@@ -724,7 +883,9 @@ export default function CadastroMembro() {
                           className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4"
                         >
                           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
-                          <p className="text-sm font-medium text-red-700">{submitError}</p>
+                          <p className="text-sm font-medium text-red-700">
+                            {submitError}
+                          </p>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -767,7 +928,11 @@ export default function CadastroMembro() {
                 >
                   {loading ? "A enviar…" : "Confirmar cadastro"}
                   <span className="grid h-9 w-9 place-items-center rounded-full bg-gray-950 text-yellow-500">
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <UserPlus className="h-4 w-4" />
+                    )}
                   </span>
                 </button>
               )}
@@ -796,7 +961,9 @@ function StepHeader({ index }: { index: number }) {
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">
           Passo {index + 1}
         </p>
-        <h2 className="font-display text-2xl font-semibold text-gray-950 md:text-3xl">{s.title}</h2>
+        <h2 className="font-display text-2xl font-semibold text-gray-950 md:text-3xl">
+          {s.title}
+        </h2>
       </div>
     </div>
   );
@@ -806,7 +973,9 @@ function inputCls(error?: string | boolean) {
   return cn(
     "h-12 w-full rounded-xl border bg-white px-4 text-base text-gray-950 outline-none transition-all placeholder:text-gray-400 md:text-sm",
     "focus:border-gray-950 focus:ring-4 focus:ring-yellow-500/30",
-    error ? "border-red-400 bg-red-50/40" : "border-gray-200 hover:border-gray-300",
+    error
+      ? "border-red-400 bg-red-50/40"
+      : "border-gray-200 hover:border-gray-300",
   );
 }
 
@@ -898,8 +1067,12 @@ function Review({
       <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
         {items.map(([k, v]) => (
           <div key={k} className="min-w-0">
-            <dt className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">{k}</dt>
-            <dd className="truncate text-sm font-medium text-gray-900">{v || "—"}</dd>
+            <dt className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+              {k}
+            </dt>
+            <dd className="truncate text-sm font-medium text-gray-900">
+              {v || "—"}
+            </dd>
           </div>
         ))}
       </dl>
@@ -939,8 +1112,17 @@ function Success({
             className="absolute left-1/2 top-0 h-3 w-1.5 rounded-sm"
             style={{ backgroundColor: c.color }}
             initial={{ x: 0, y: -20, opacity: 1, rotate: 0 }}
-            animate={{ x: `${c.x}vw`, y: "90vh", opacity: 0, rotate: c.rotate + 360 }}
-            transition={{ duration: 2.4, delay: c.delay, ease: [0.2, 0.6, 0.4, 1] }}
+            animate={{
+              x: `${c.x}vw`,
+              y: "90vh",
+              opacity: 0,
+              rotate: c.rotate + 360,
+            }}
+            transition={{
+              duration: 2.4,
+              delay: c.delay,
+              ease: [0.2, 0.6, 0.4, 1],
+            }}
           />
         ))}
       </div>
@@ -968,8 +1150,8 @@ function Success({
           transition={{ delay: 0.25 }}
           className="mx-auto mt-3 max-w-xl text-gray-600 print:hidden"
         >
-          O seu cadastro foi registado. Este é o seu cartão de membro das Obras Missionárias
-          Pontifícias.
+          O seu cadastro foi registado. Este é o seu cartão de membro das Obras
+          Missionárias Pontifícias.
         </motion.p>
 
         {pendente && (
@@ -981,8 +1163,11 @@ function Success({
           >
             <Hourglass className="mt-0.5 h-5 w-5 shrink-0" />
             <p className="text-sm text-gray-700">
-              <span className="font-semibold text-gray-950">Aguarde a aprovação.</span> Como
-              Assessor, o seu registo será validado pelo Secretariado antes de ficar ativo.
+              <span className="font-semibold text-gray-950">
+                Aguarde a aprovação.
+              </span>{" "}
+              Como Assessor, o seu registo será validado pelo Secretariado antes
+              de ficar ativo.
             </p>
           </motion.div>
         )}

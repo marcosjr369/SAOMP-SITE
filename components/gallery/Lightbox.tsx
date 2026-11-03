@@ -17,7 +17,12 @@ type LightboxProps = {
 
 const SWIPE = 80;
 
-export default function Lightbox({ photos, index, onChange, onClose }: LightboxProps) {
+export default function Lightbox({
+  photos,
+  index,
+  onChange,
+  onClose,
+}: LightboxProps) {
   const [dir, setDir] = useState<1 | -1>(1);
   const thumbsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const photo = photos[index];
@@ -84,7 +89,13 @@ export default function Lightbox({ photos, index, onChange, onClose }: LightboxP
           transition={{ duration: 0.6 }}
           className="pointer-events-none absolute inset-0"
         >
-          <Image src={photo.src} alt="" fill sizes="10vw" className="scale-125 object-cover blur-3xl" />
+          <Image
+            src={photo.src}
+            alt=""
+            fill
+            sizes="10vw"
+            className="scale-125 object-cover blur-3xl"
+          />
         </motion.div>
       </AnimatePresence>
       <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-gray-950/70 via-gray-950/40 to-gray-950/90" />
@@ -105,7 +116,8 @@ export default function Lightbox({ photos, index, onChange, onClose }: LightboxP
             </motion.span>
           </AnimatePresence>
           <span className="text-sm tabular-nums text-white/60">
-            <span className="font-semibold text-white">{index + 1}</span> / {photos.length}
+            <span className="font-semibold text-white">{index + 1}</span> /{" "}
+            {photos.length}
           </span>
         </div>
 
@@ -114,7 +126,10 @@ export default function Lightbox({ photos, index, onChange, onClose }: LightboxP
           aria-label="Fechar"
           className="group grid h-11 w-11 place-items-center rounded-full bg-white text-gray-950 shadow-lg transition-colors hover:bg-yellow-500"
         >
-          <X size={20} className="transition-transform duration-300 group-hover:rotate-90" />
+          <X
+            size={20}
+            className="transition-transform duration-300 group-hover:rotate-90"
+          />
         </button>
       </div>
 
@@ -191,7 +206,13 @@ export default function Lightbox({ photos, index, onChange, onClose }: LightboxP
                     : "opacity-40 hover:opacity-90",
                 )}
               >
-                <Image src={p.src} alt="" fill sizes="96px" className="object-cover" />
+                <Image
+                  src={p.src}
+                  alt=""
+                  fill
+                  sizes="96px"
+                  className="object-cover"
+                />
               </button>
             );
           })}

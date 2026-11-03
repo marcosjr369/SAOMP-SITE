@@ -6,8 +6,6 @@ import { Portal } from "@/components/ui/portal";
 import { cn } from "@/lib/utils";
 import {
   User,
-  Mail,
-  Phone,
   Calendar,
   Users,
   Layers,
@@ -22,10 +20,8 @@ import {
 } from "lucide-react";
 
 type Membro = {
+  _id?: string;
   nome: string;
-  email: string;
-  telefone: string;
-  nascimento: string;
   genero: string;
   obra: string;
   vigararia: string;
@@ -34,15 +30,13 @@ type Membro = {
   tipoMembro: string;
 };
 
-type MembroApi = Omit<Membro, "telefone"> & { telefone: string | number };
+type MembroApi = Membro;
 
-const API_URL = "https://saomp-back.vercel.app/api";
+const API_URL = "/api/members";
 
-/** Minúsculas e sem acentos, para comparar "União" com "uniao", etc. */
 const normalize = (s: string) =>
   (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
-// O cadastro grava, por exemplo, "Liga Missionária"; os filtros comparam por palavra-chave.
 const obraFilters = [
   { label: "Todas", key: "" },
   { label: "IAM", key: "iam" },
@@ -59,7 +53,6 @@ const tipoFilters = [
   { label: "Director", key: "director" },
 ];
 
-// Iniciais decorativas à volta da pesquisa (apenas visual)
 const floatingPeople = [
   {
     initials: "IAM",
@@ -129,22 +122,20 @@ export default function BuscaMembros() {
         }
 
         // A API devolve a lista diretamente; aceita também { members: [...] }
-        const lista: MembroApi[] = Array.isArray(data) ? data : (data?.members ?? []);
+        const lista: MembroApi[] = Array.isArray(data)
+          ? data
+          : (data?.members ?? []);
 
-        const membrosFormatados: Membro[] = lista.map(
-          (m) => ({
-            nome: m.nome,
-            email: m.email,
-            telefone: String(m.telefone),
-            nascimento: new Date(m.nascimento).toLocaleDateString("pt-PT"),
-            genero: m.genero,
-            obra: m.obra,
-            vigararia: m.vigararia,
-            paroquia: m.paroquia,
-            anoAdmissao: new Date(m.anoAdmissao).getFullYear().toString(),
-            tipoMembro: m.tipoMembro,
-          }),
-        );
+        const membrosFormatados: Membro[] = lista.map((m) => ({
+          _id: m._id,
+          nome: m.nome,
+          genero: m.genero,
+          obra: m.obra,
+          vigararia: m.vigararia,
+          paroquia: m.paroquia,
+          anoAdmissao: new Date(m.anoAdmissao).getFullYear().toString(),
+          tipoMembro: m.tipoMembro,
+        }));
 
         setMembros(membrosFormatados);
         setError(null);
@@ -484,7 +475,7 @@ export default function BuscaMembros() {
                 <motion.button
                   layout
                   type="button"
-                  key={`${membro.nome}-${membro.email}-${idx}`}
+                  key={membro._id ?? `${membro.nome}-${membro.obra}-${idx}`}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
@@ -546,121 +537,120 @@ export default function BuscaMembros() {
       </div>
 
       <Portal>
-        <AnimatePresence>
-          {selectedMembro && (
+        {selectedMembro && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-100 flex items-center justify-center bg-gray-950/60 p-3 backdrop-blur-md sm:p-5"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) setSelectedMembro(null);
+            }}
+          >
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-60 flex items-center justify-center bg-gray-950/60 p-4 backdrop-blur-sm"
-              onClick={() => setSelectedMembro(null)}
+              initial={{ y: 40, opacity: 0, scale: 0.97 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="relative flex max-h-[90dvh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label={selectedMembro.nome}
             >
-              <motion.div
-                initial={{ y: 40, opacity: 0, scale: 0.97 }}
-                animate={{ y: 0, opacity: 1, scale: 1 }}
-                exit={{ y: 40, opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-modal="true"
-                aria-label={selectedMembro.nome}
-              >
-                <div className="relative overflow-hidden bg-gray-950 px-6 pb-8 pt-6 text-white md:px-8">
-                  <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-yellow-500/25 blur-3xl" />
-                  <button
-                    onClick={() => setSelectedMembro(null)}
-                    aria-label="Fechar"
-                    className="group absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white text-gray-950 transition-colors hover:bg-yellow-500"
-                  >
-                    <X
-                      size={18}
-                      className="transition-transform duration-300 group-hover:rotate-90"
-                    />
-                  </button>
+              <div className="relative shrink-0 overflow-hidden bg-gray-950 px-5 pb-6 pt-5 text-white sm:px-7 sm:pb-7 sm:pt-6">
+                <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-yellow-500/25 blur-3xl" />
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setSelectedMembro(null);
+                  }}
+                  aria-label="Fechar"
+                  title="Fechar detalhes do membro"
+                  className="group absolute right-3 top-3 z-20 grid h-14 w-14 touch-manipulation place-items-center rounded-full bg-white text-gray-950 shadow-lg transition-colors hover:bg-yellow-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-500 sm:right-4 sm:top-4"
+                >
+                  <X
+                    size={18}
+                    className="transition-transform duration-300 group-hover:rotate-90"
+                  />
+                </button>
 
-                  <div className="relative flex items-center gap-5">
-                    <Avatar nome={selectedMembro.nome} large />
-                    <div className="min-w-0">
-                      <h2 className="font-display text-2xl font-semibold leading-tight md:text-3xl">
-                        {selectedMembro.nome}
-                      </h2>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        <span className="rounded-full bg-yellow-500 px-3 py-1 text-xs font-semibold text-gray-950">
-                          {selectedMembro.obra}
-                        </span>
-                        <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
-                          {tipoLabel(selectedMembro.tipoMembro)}
-                        </span>
-                      </div>
+                <div className="relative z-10 flex items-center gap-4 pr-14 sm:gap-5 sm:pr-16">
+                  <Avatar nome={selectedMembro.nome} large />
+                  <div className="min-w-0">
+                    <h2 className="wrap-break-word font-display text-2xl font-semibold leading-tight sm:text-3xl">
+                      {selectedMembro.nome}
+                    </h2>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span className="rounded-full bg-yellow-500 px-3 py-1 text-xs font-semibold text-gray-950">
+                        {selectedMembro.obra}
+                      </span>
+                      <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
+                        {tipoLabel(selectedMembro.tipoMembro)}
+                      </span>
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="relative mt-6 flex flex-wrap gap-2">
-                    <a
-                      href={`tel:${selectedMembro.telefone}`}
-                      className="group inline-flex h-11 items-center gap-3 rounded-full bg-white pl-1.5 pr-5 text-sm font-semibold text-gray-950 transition-transform hover:-translate-y-0.5"
-                    >
-                      <span className="grid h-8 w-8 place-items-center rounded-full bg-yellow-500">
-                        <Phone className="h-4 w-4" />
-                      </span>
-                      Ligar
-                    </a>
-                    <a
-                      href={`mailto:${selectedMembro.email}`}
-                      className="group inline-flex h-11 items-center gap-3 rounded-full bg-white pl-1.5 pr-5 text-sm font-semibold text-gray-950 transition-transform hover:-translate-y-0.5"
-                    >
-                      <span className="grid h-8 w-8 place-items-center rounded-full bg-yellow-500">
-                        <Mail className="h-4 w-4" />
-                      </span>
-                      Enviar email
-                    </a>
+              <div className="min-h-0 overflow-y-auto px-5 py-5 sm:px-7 sm:py-6">
+                <section aria-labelledby="member-personal-heading">
+                  <h3
+                    id="member-personal-heading"
+                    className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-gray-400"
+                  >
+                    Dados pessoais
+                  </h3>
+                  <div className="grid gap-x-8 sm:grid-cols-2">
+                    <Info
+                      icon={Users}
+                      label="Género"
+                      text={selectedMembro.genero}
+                    />
                   </div>
-                </div>
+                </section>
 
-                <div className="grid gap-3 p-6 sm:grid-cols-2 md:p-8">
-                  <Info icon={Mail} label="Email" text={selectedMembro.email} />
-                  <Info
-                    icon={Phone}
-                    label="Telefone"
-                    text={selectedMembro.telefone}
-                  />
-                  <Info
-                    icon={Calendar}
-                    label="Nascimento"
-                    text={selectedMembro.nascimento}
-                  />
-                  <Info
-                    icon={Users}
-                    label="Género"
-                    text={selectedMembro.genero}
-                  />
-                  <Info icon={Layers} label="Obra" text={selectedMembro.obra} />
-                  <Info
-                    icon={Star}
-                    label="Tipo de membro"
-                    text={tipoLabel(selectedMembro.tipoMembro)}
-                  />
-                  <Info
-                    icon={MapPin}
-                    label="Vigararia"
-                    text={selectedMembro.vigararia}
-                  />
-                  <Info
-                    icon={MapPin}
-                    label="Paróquia"
-                    text={selectedMembro.paroquia}
-                  />
-                  <Info
-                    icon={Calendar}
-                    label="Ano de admissão"
-                    text={selectedMembro.anoAdmissao}
-                  />
-                </div>
-              </motion.div>
+                <section
+                  className="mt-5 border-t border-gray-100 pt-5"
+                  aria-labelledby="member-mission-heading"
+                >
+                  <h3
+                    id="member-mission-heading"
+                    className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-gray-400"
+                  >
+                    Dados missionários
+                  </h3>
+                  <div className="grid gap-x-8 sm:grid-cols-2">
+                    <Info
+                      icon={Layers}
+                      label="Obra"
+                      text={selectedMembro.obra}
+                    />
+                    <Info
+                      icon={Star}
+                      label="Tipo de membro"
+                      text={tipoLabel(selectedMembro.tipoMembro)}
+                    />
+                    <Info
+                      icon={MapPin}
+                      label="Vigararia"
+                      text={selectedMembro.vigararia}
+                    />
+                    <Info
+                      icon={MapPin}
+                      label="Paróquia"
+                      text={selectedMembro.paroquia}
+                    />
+                    <Info
+                      icon={Calendar}
+                      label="Ano de admissão"
+                      text={selectedMembro.anoAdmissao}
+                    />
+                  </div>
+                </section>
+              </div>
             </motion.div>
-          )}
-        </AnimatePresence>
+          </motion.div>
+        )}
       </Portal>
     </section>
   );
