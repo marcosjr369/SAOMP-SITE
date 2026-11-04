@@ -12,6 +12,7 @@ import {
   Printer,
   RefreshCw,
   Search,
+  Trash2,
   Users,
   X,
 } from "lucide-react";
@@ -107,6 +108,9 @@ export default function AdminMembersPage() {
   const [search, setSearch] = useState("");
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [memberToDelete, setMemberToDelete] = useState<Member | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [selectedCardMember, setSelectedCardMember] = useState<Member | null>(
     null,
   );
@@ -244,6 +248,66 @@ export default function AdminMembersPage() {
       );
     } finally {
       setApprovingId(null);
+    }
+  }
+
+  async function deleteMember(member: Member) {
+    const id = member._id ?? member.id;
+    if (!id) {
+      setDeleteError("Esta conta não tem um identificador válido.");
+      return;
+    }
+
+    const removeFromList = () =>
+      setMembers((current) =>
+        current.filter((item) => (item._id ?? item.id) !== id),
+      );
+
+    setDeletingId(id);
+    setDeleteError(null);
+    try {
+      const response = await fetch(backendProxyUrl(["admin", "members", id]), {
+        method: "DELETE",
+        headers: backendProxyHeaders("api"),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) {
+        if (response.status === 401) {
+          await fetch(backendProxyUrl(["admin", "login"]), {
+            method: "DELETE",
+            headers: backendProxyHeaders("api"),
+          }).catch(() => null);
+          window.location.replace("/admin/membros/acesso");
+          return;
+        }
+        if (response.status === 403) {
+          throw new Error("Esta conta não tem permissão para apagar membros.");
+        }
+        if (response.status === 404) {
+          removeFromList();
+          setMemberToDelete(null);
+          setNotice("A conta já tinha sido removida.");
+          return;
+        }
+        throw new Error(
+          body?.message ||
+            `Não foi possível apagar a conta (${response.status}).`,
+        );
+      }
+
+      removeFromList();
+      setMemberToDelete(null);
+      setNotice(`Conta de ${member.nome || "membro"} apagada.`);
+    } catch (removeError) {
+      setDeleteError(
+        removeError instanceof TypeError
+          ? "Não foi possível ligar ao servidor. Tente novamente."
+          : removeError instanceof Error
+            ? removeError.message
+            : "Ocorreu um erro ao apagar a conta.",
+      );
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -533,6 +597,18 @@ export default function AdminMembersPage() {
                         Aprovar conta
                       </button>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeleteError(null);
+                        setMemberToDelete(member);
+                      }}
+                      disabled={deletingId !== null}
+                      className="inline-flex h-11 items-center justify-center gap-2 border border-red-200 px-4 text-sm font-semibold text-red-700 transition hover:border-red-700 hover:bg-red-50 disabled:cursor-wait disabled:opacity-60"
+                    >
+                      <Trash2 size={16} />
+                      Apagar
+                    </button>
                   </div>
                 </article>
               );
@@ -546,6 +622,81 @@ export default function AdminMembersPage() {
           </p>
         )}
       </div>
+
+      {memberToDelete && (
+        <div
+          className="fixed inset-0 z-70 flex items-center justify-center bg-gray-950/65 p-4 backdrop-blur-sm"
+          onClick={(event) => {
+            if (event.target === event.currentTarget && deletingId === null) {
+              setMemberToDelete(null);
+            }
+          }}
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="delete-member-title"
+            aria-describedby="delete-member-description"
+            className="w-full max-w-md bg-white p-6 shadow-2xl"
+          >
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center bg-red-100 text-red-700">
+                <Trash2 size={18} />
+              </span>
+              <div>
+                <h2
+                  id="delete-member-title"
+                  className="font-display text-xl font-semibold text-gray-950"
+                >
+                  Apagar conta?
+                </h2>
+                <p
+                  id="delete-member-description"
+                  className="mt-1 text-sm text-gray-600"
+                >
+                  A conta de{" "}
+                  <strong className="text-gray-900">
+                    {memberToDelete.nome || "este membro"}
+                  </strong>{" "}
+                  será removida permanentemente. Esta ação não pode ser
+                  desfeita.
+                </p>
+              </div>
+            </div>
+
+            {deleteError && (
+              <p className="mt-4 text-sm text-red-700" role="alert">
+                {deleteError}
+              </p>
+            )}
+
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setMemberToDelete(null)}
+                disabled={deletingId !== null}
+                className="inline-flex h-11 items-center border border-gray-300 px-4 text-sm font-semibold text-gray-800 transition hover:border-gray-950 hover:bg-gray-50 disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                autoFocus
+                onClick={() => void deleteMember(memberToDelete)}
+                disabled={deletingId !== null}
+                className="inline-flex h-11 items-center gap-2 bg-red-700 px-4 text-sm font-semibold text-white transition hover:bg-red-800 disabled:cursor-wait disabled:opacity-60"
+              >
+                {deletingId !== null ? (
+                  <LoaderCircle size={16} className="animate-spin" />
+                ) : (
+                  <Trash2 size={16} />
+                )}
+                {deletingId !== null ? "A apagar…" : "Apagar conta"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selectedCardMember && (
         <div
