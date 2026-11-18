@@ -13,9 +13,15 @@ import {
   BookOpen,
   Images,
   FileText,
+  LoaderCircle,
+  LogOut,
+  UserCog,
+  Users,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { backendProxyHeaders, backendProxyUrl } from "@/lib/proxy-client";
+import { Portal } from "@/components/ui/portal";
 import { usePathname } from "next/navigation";
 
 const navItems = [
@@ -41,6 +47,10 @@ export default function Header() {
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
   }, [open]);
+
+  if (path.startsWith("/admin") && path !== "/admin/membros/acesso") {
+    return <AdminHeader path={path} />;
+  }
 
   return (
     <header className="fixed top-0 left-0 w-full z-50">
@@ -237,6 +247,164 @@ export default function Header() {
           </>
         )}
       </AnimatePresence>
+    </header>
+  );
+}
+
+const adminNavItems = [
+  { label: "Membros", href: "/admin/membros", icon: Users },
+  { label: "Coordenadores", href: "/admin/coordenadores", icon: UserCog },
+];
+
+function AdminHeader({ path }: { path: string }) {
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  useEffect(() => {
+    if (!confirmOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !loggingOut) setConfirmOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [confirmOpen, loggingOut]);
+
+  async function logout() {
+    setLoggingOut(true);
+    await fetch(backendProxyUrl(["admin", "login"]), {
+      method: "DELETE",
+      headers: backendProxyHeaders("api"),
+    }).catch(() => null);
+    window.location.replace("/admin/membros/acesso");
+  }
+
+  return (
+    <header className="fixed top-0 left-0 z-50 w-full border-b border-gray-200/80 bg-[#fbfbf8]/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-3 px-4 sm:px-5">
+        <div className="flex shrink-0 items-center gap-3">
+          <span className="relative h-10 w-10 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200">
+            <Image
+              src="/logo.jpeg"
+              alt="Logo do Movimento SAOMP"
+              fill
+              sizes="40px"
+              className="object-cover"
+              priority
+            />
+          </span>
+          <span className="hidden flex-col sm:flex">
+            <span className="font-display text-xl font-semibold leading-none tracking-tight text-gray-950">
+              SAOMP
+            </span>
+            <span className="mt-1 text-[10px] font-medium uppercase tracking-[0.14em] text-gray-500">
+              Administração
+            </span>
+          </span>
+        </div>
+
+        <div className="flex min-w-0 items-center gap-1 sm:gap-3">
+          <nav className="flex items-center gap-1" aria-label="Administração">
+            {adminNavItems.map((item) => {
+              const active =
+                path === item.href || path.startsWith(`${item.href}/`);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  aria-label={item.label}
+                  className={cn(
+                    "inline-flex h-10 items-center gap-2 px-3 text-sm transition-colors",
+                    active
+                      ? "bg-gray-950 font-medium text-white"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-950",
+                  )}
+                >
+                  <Icon size={16} className="shrink-0" />
+                  <span className="hidden md:inline">{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(true)}
+            aria-label="Terminar sessão"
+            className="inline-flex h-10 items-center gap-2 border border-red-200 px-3 text-sm font-semibold text-red-700 transition hover:border-red-700 hover:bg-red-50"
+          >
+            <LogOut size={16} />
+            <span className="hidden sm:inline">Terminar sessão</span>
+          </button>
+        </div>
+      </div>
+
+      {confirmOpen && (
+        <Portal>
+          <div
+            className="fixed inset-0 z-70 flex items-center justify-center bg-gray-950/65 p-4 backdrop-blur-sm"
+            onClick={(event) => {
+              if (event.target === event.currentTarget && !loggingOut) {
+                setConfirmOpen(false);
+              }
+            }}
+          >
+            <div
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="logout-title"
+              aria-describedby="logout-description"
+              className="w-full max-w-md bg-white p-6 shadow-2xl"
+            >
+              <div className="flex items-start gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center bg-red-100 text-red-700">
+                  <LogOut size={18} />
+                </span>
+                <div>
+                  <h2
+                    id="logout-title"
+                    className="font-display text-xl font-semibold text-gray-950"
+                  >
+                    Terminar sessão?
+                  </h2>
+                  <p
+                    id="logout-description"
+                    className="mt-1 text-sm text-gray-600"
+                  >
+                    Vai sair do painel de administração e terá de entrar
+                    novamente para continuar.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmOpen(false)}
+                  disabled={loggingOut}
+                  className="inline-flex h-11 items-center border border-gray-300 px-4 text-sm font-semibold text-gray-800 transition hover:border-gray-950 hover:bg-gray-50 disabled:opacity-60"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={() => void logout()}
+                  disabled={loggingOut}
+                  className="inline-flex h-11 items-center gap-2 bg-red-700 px-4 text-sm font-semibold text-white transition hover:bg-red-800 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {loggingOut ? (
+                    <LoaderCircle size={16} className="animate-spin" />
+                  ) : (
+                    <LogOut size={16} />
+                  )}
+                  {loggingOut ? "A terminar…" : "Terminar sessão"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
     </header>
   );
 }

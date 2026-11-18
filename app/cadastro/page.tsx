@@ -23,6 +23,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { vigararias } from "@/lib/vigararias";
+import { errorMessage, readApiError } from "@/lib/api-errors";
 import {
   MemberCard,
   memberNumber,
@@ -101,17 +103,6 @@ const obras = [
   },
   { value: "Familia Missionária", label: "Família Missionária", sigla: "FM" },
   { value: "União Missionária", label: "União Missionária", sigla: "UM" },
-];
-
-const vigararias = [
-  "São Pedro Apóstolo",
-  "Santo António",
-  "São João Baptista da Cazanga",
-  "Nª Sª de Fátima",
-  "São Carlos Lwanga",
-  "São João Calabria",
-  "Nª Sª da Conceição",
-  "Santo Agostinho",
 ];
 
 const tipos: {
@@ -345,22 +336,19 @@ export default function CadastroMembro() {
         }),
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        throw await readApiError(res, {
+          409: "Já existe um cadastro com estes dados.",
+        });
+      }
       const body = await res.json().catch(() => null);
-      if (!res.ok)
-        throw new Error(
-          body?.message || "Não foi possível concluir o cadastro.",
-        );
 
       const id: string | undefined = body?.member?._id ?? body?._id;
       setDone({ numero: numeroFor(data, id), data });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       setSubmitError(
-        err instanceof TypeError
-          ? "Sem ligação ao servidor. Verifique a internet e tente novamente."
-          : err instanceof Error
-            ? err.message
-            : "Erro inesperado.",
+        errorMessage(err, "Não foi possível concluir o cadastro."),
       );
     } finally {
       setLoading(false);

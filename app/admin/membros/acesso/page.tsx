@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Image from "next/image";
 import { ArrowRight, KeyRound, LoaderCircle, ShieldCheck } from "lucide-react";
 import { backendProxyHeaders, backendProxyUrl } from "@/lib/proxy-client";
+import { errorMessage, readApiError } from "@/lib/api-errors";
 
 export default function AdminAccessPage() {
   const [email, setEmail] = useState("");
@@ -24,30 +25,18 @@ export default function AdminAccessPage() {
         }),
         body: JSON.stringify({ email: email.trim(), password }),
       });
-      const responseText = await response.text();
-      let body: { message?: string; error?: { message?: string } } | null =
-        null;
-      try {
-        body = JSON.parse(responseText);
-      } catch {
-        body = null;
-      }
       if (!response.ok) {
-        throw new Error(
-          body?.message ||
-            body?.error?.message ||
-            responseText ||
-            "Não foi possível iniciar sessão.",
-        );
+        throw await readApiError(response, {
+          400: "Introduza o email e a palavra-passe.",
+          401: "Email ou palavra-passe incorretos.",
+          403: "Esta conta não tem acesso ao painel de administração.",
+          404: "Email ou palavra-passe incorretos.",
+        });
       }
       window.location.replace("/admin/membros");
     } catch (loginError) {
       setError(
-        loginError instanceof TypeError
-          ? "Sem ligação ao servidor. Tente novamente."
-          : loginError instanceof Error
-            ? loginError.message
-            : "Ocorreu um erro ao iniciar sessão.",
+        errorMessage(loginError, "Não foi possível iniciar sessão."),
       );
       setLoading(false);
     }

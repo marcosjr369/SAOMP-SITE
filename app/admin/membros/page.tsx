@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { backendProxyHeaders, backendProxyUrl } from "@/lib/proxy-client";
+import { errorMessage, readApiError } from "@/lib/api-errors";
 import {
   MemberCard,
   type MemberCardData,
@@ -89,6 +90,14 @@ function memberCardData(member: Member): MemberCardData {
   };
 }
 
+async function endSession() {
+  await fetch(backendProxyUrl(["admin", "login"]), {
+    method: "DELETE",
+    headers: backendProxyHeaders("api"),
+  }).catch(() => null);
+  window.location.replace("/admin/membros/acesso");
+}
+
 function getMemberList(data: unknown): Member[] {
   if (Array.isArray(data)) return data as Member[];
   if (!data || typeof data !== "object") return [];
@@ -129,33 +138,17 @@ export default function AdminMembersPage() {
         cache: "no-store",
         headers: backendProxyHeaders("api"),
       });
-      const body = await response.json().catch(() => null);
       if (!response.ok) {
-        if (response.status === 401) {
-          await fetch(backendProxyUrl(["admin", "login"]), {
-            method: "DELETE",
-            headers: backendProxyHeaders("api"),
-          }).catch(() => null);
-          window.location.replace("/admin/membros/acesso");
-          return;
-        }
-        if (response.status === 403) {
-          throw new Error(
-            "Esta conta não tem permissão para administrar membros.",
-          );
-        }
-        throw new Error(
-          body?.message || `Falha ao carregar contas (${response.status}).`,
-        );
+        if (response.status === 401) return endSession();
+        throw await readApiError(response, {
+          403: "Esta conta não tem permissão para administrar membros.",
+        });
       }
+      const body = await response.json().catch(() => null);
       setMembers(getMemberList(body));
     } catch (loadError) {
       setError(
-        loadError instanceof TypeError
-          ? "Não foi possível ligar ao servidor. Verifique a sua ligação."
-          : loadError instanceof Error
-            ? loadError.message
-            : "Ocorreu um erro ao carregar as contas.",
+        errorMessage(loadError, "Ocorreu um erro ao carregar as contas."),
       );
     } finally {
       setLoading(false);
@@ -205,23 +198,12 @@ export default function AdminMembersPage() {
         backendProxyUrl(["admin", "members", id, "verify"]),
         { method: "PATCH", headers: backendProxyHeaders("api") },
       );
-      const body = await response.json().catch(() => null);
       if (!response.ok) {
-        if (response.status === 401) {
-          await fetch(backendProxyUrl(["admin", "login"]), {
-            method: "DELETE",
-            headers: backendProxyHeaders("api"),
-          }).catch(() => null);
-          window.location.replace("/admin/membros/acesso");
-          return;
-        }
-        if (response.status === 403) {
-          throw new Error("Esta conta não tem permissão para aprovar membros.");
-        }
-        throw new Error(
-          body?.message ||
-            `Não foi possível aprovar a conta (${response.status}).`,
-        );
+        if (response.status === 401) return endSession();
+        throw await readApiError(response, {
+          403: "Esta conta não tem permissão para aprovar membros.",
+          404: "Esta conta já não existe. Atualize a lista.",
+        });
       }
 
       setMembers((current) =>
@@ -240,11 +222,7 @@ export default function AdminMembersPage() {
       setNotice(`Conta de ${member.nome || "membro"} aprovada.`);
     } catch (approvalError) {
       setNotice(
-        approvalError instanceof TypeError
-          ? "Não foi possível ligar ao servidor. Tente novamente."
-          : approvalError instanceof Error
-            ? approvalError.message
-            : "Ocorreu um erro ao aprovar a conta.",
+        errorMessage(approvalError, "Ocorreu um erro ao aprovar a conta."),
       );
     } finally {
       setApprovingId(null);
@@ -270,29 +248,17 @@ export default function AdminMembersPage() {
         method: "DELETE",
         headers: backendProxyHeaders("api"),
       });
-      const body = await response.json().catch(() => null);
       if (!response.ok) {
-        if (response.status === 401) {
-          await fetch(backendProxyUrl(["admin", "login"]), {
-            method: "DELETE",
-            headers: backendProxyHeaders("api"),
-          }).catch(() => null);
-          window.location.replace("/admin/membros/acesso");
-          return;
-        }
-        if (response.status === 403) {
-          throw new Error("Esta conta não tem permissão para apagar membros.");
-        }
+        if (response.status === 401) return endSession();
         if (response.status === 404) {
           removeFromList();
           setMemberToDelete(null);
           setNotice("A conta já tinha sido removida.");
           return;
         }
-        throw new Error(
-          body?.message ||
-            `Não foi possível apagar a conta (${response.status}).`,
-        );
+        throw await readApiError(response, {
+          403: "Esta conta não tem permissão para apagar membros.",
+        });
       }
 
       removeFromList();
@@ -300,11 +266,7 @@ export default function AdminMembersPage() {
       setNotice(`Conta de ${member.nome || "membro"} apagada.`);
     } catch (removeError) {
       setDeleteError(
-        removeError instanceof TypeError
-          ? "Não foi possível ligar ao servidor. Tente novamente."
-          : removeError instanceof Error
-            ? removeError.message
-            : "Ocorreu um erro ao apagar a conta.",
+        errorMessage(removeError, "Ocorreu um erro ao apagar a conta."),
       );
     } finally {
       setDeletingId(null);

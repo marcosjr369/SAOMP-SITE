@@ -26,13 +26,20 @@ function jsonResponse(body: unknown, status = 200) {
 
 function proxyFailure(error: unknown) {
   if (error instanceof ProxyConfigurationError) {
+    console.error(`[proxy] configuração em falta: ${error.message}`);
     return jsonResponse(
-      { message: `Configuração da proxy em falta: ${error.message}.` },
+      {
+        message:
+          "O serviço está temporariamente indisponível. Tente novamente mais tarde.",
+      },
       503,
     );
   }
   return jsonResponse(
-    { message: "Não foi possível contactar o servidor." },
+    {
+      message:
+        "Não foi possível contactar o servidor. Tente novamente dentro de alguns minutos.",
+    },
     502,
   );
 }

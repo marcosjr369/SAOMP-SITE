@@ -35,7 +35,11 @@ const maintenanceHtml = `<!doctype html>
 
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const isAdminRoute = pathname === "/admin/membros" || pathname.startsWith("/admin/membros/");
+  const isAdminRoute =
+    pathname === "/admin/membros" ||
+    pathname.startsWith("/admin/membros/") ||
+    pathname === "/admin/coordenadores" ||
+    pathname.startsWith("/admin/coordenadores/");
   const isAccessRoute = pathname === "/admin/membros/acesso";
   const hasAdminSession = request.cookies.has(ADMIN_SESSION_COOKIE);
 

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Portal } from "@/components/ui/portal";
 import { backendProxyHeaders, backendProxyUrl } from "@/lib/proxy-client";
+import { errorMessage, readApiError } from "@/lib/api-errors";
 import { cn } from "@/lib/utils";
 import {
   User,
@@ -115,13 +116,8 @@ export default function BuscaMembros() {
           signal: controller.signal,
           headers: backendProxyHeaders("api"),
         });
+        if (!res.ok) throw await readApiError(res);
         const data = await res.json().catch(() => null);
-
-        if (!res.ok) {
-          throw new Error(
-            data?.message || `O servidor respondeu com o erro ${res.status}.`,
-          );
-        }
 
         // A API devolve a lista diretamente; aceita também { members: [...] }
         const lista: MembroApi[] = Array.isArray(data)
@@ -143,13 +139,7 @@ export default function BuscaMembros() {
         setError(null);
       } catch (err) {
         if (controller.signal.aborted) return;
-        setError(
-          err instanceof TypeError
-            ? "Não foi possível ligar ao servidor. Verifique a sua ligação à internet."
-            : err instanceof Error
-              ? err.message
-              : "Erro inesperado ao carregar os membros.",
-        );
+        setError(errorMessage(err, "Erro inesperado ao carregar os membros."));
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }

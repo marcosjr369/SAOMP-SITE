@@ -155,7 +155,9 @@ const Footer = () => {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear();
 
-  if (pathname.startsWith("/admin/membros")) return null;
+  if (pathname.startsWith("/admin") && pathname !== "/admin/membros/acesso") {
+    return null;
+  }
 
   return (
     <footer className="relative bg-gray-950 text-white">
